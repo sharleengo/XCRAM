@@ -6,9 +6,8 @@ guidance of Ma. Rowena C. Solamo for the 1st and 2nd Semester of the academic ye
 2017.
 
 <Group Name>
+
 Agluba, Gerry P. Jr.
-
 Go, Sharleen Joy Y.
-
 Silverio, Robelle C.
 
