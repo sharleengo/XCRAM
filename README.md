@@ -1,2 +1,11 @@
-# XCRAM
-XCRAM is a tool for student and workers to effectively organize their task for a specific time. It is a software application that generates an ideal schedule of tasks that a given user provides. It is suitable for those busy people or for those people who usually cram.
+XCRAM
+
+This is a course requirement for CS191/192 Software Engineering Course of the Department of
+Computer Science, College of Engineering, University of the Philippines, Diliman under the
+guidance of Ma. Rowena C. Solamo for the 1st and 2nd Semester of the academic year 2016-
+2017.
+
+<Group Name>
+Agluba, Gerry P. Jr.
+Go, Sharleen Joy Y.
+Silverio, Robelle C.
