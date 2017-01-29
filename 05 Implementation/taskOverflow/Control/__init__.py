@@ -23,7 +23,7 @@ class AddTask():
 			if(task.muststart<0 or task.muststart>=2400 ):
 				print ('error your mustart must lie from 0 to not higher than 2400') 
 				return False
-			if(task.mustend<=0 or task.muststart>2400 ):
+			if(task.mustend<=0 or task.mustend>2400 ):
 				print ('error your mustend must be greater than 0 but not higher than 2400') 
 				return False
 			if(task.mustend<=task.muststart ):
@@ -41,17 +41,14 @@ class AddTask():
 			if(task.duration==None):
 				print ("error you entered a task with no duration") 
 				return False
-			if(task.lowerbound<0 or task.upperbound>=2400 ):
+			if(task.lowerbound<0 or task.lowerbound>=2400 ):
 				print ('error your lowerbound must lie from 0 to not higher than 2400') 
 				return False
-			if(task.lowerbound<=0 or task.upperbound>2400 ):
+			if(task.upperbound<=0 or task.upperbound>2400 ):
 				print ('error your upperbound must be greater than 0 but not higher than 2400') 
 				return False
 			if(task.lowerbound<=task.upperbound ):
 				print ('error your upperbound must be greater lowerbound') 
-				return False
-			if(duration <=task.upperbound-task.lowerbound ):
-				print ('error your mustend must be greater muststart') 
 				return False
 			if(task.priority<0):
 				print ('error entered number is not allowed') 
