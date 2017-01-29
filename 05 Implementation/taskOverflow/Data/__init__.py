@@ -88,18 +88,6 @@ class AllocationSpace():
 			if startTB==None:
 				print ("task cannot be allocated")
 				return
-			'''else:
-				timeRemaining=tflex.duration
-				#while(timeRemaining>0):
-				tasktokick=self.LocateKick(self.space.index(startTB),tflex)
-				if(tasktokick==None):
-					return
-				else:
-					self.Kick(tasktokick)
-					self.Merge()
-					startTB=self.SearchStartingTimeBlock(tflex)					
-					print "startingBlock","\t",startTB.startTime,startTB.endTime
-					print self.priorityQueue'''
 
 		print (startTB.startTime,startTB.endTime)
 		if(not startTB.isFree()):
@@ -127,15 +115,6 @@ class AllocationSpace():
 
 
 		while(timeRemaining>0):
-			'''tasktokick=self.LocateKick(self.space.index(startTB),tflex)
-			if(tasktokick==None):
-				print "unable to allocate space for the given task"
-				return
-			else:
-				self.Kick(tasktokick)
-				self.Merge()
-				timeRemaining=self.AllocateMaxTime(self.space.index(startTB),tflex,tflex.duration)		
-				startTB=self.SearchStartingTimeBlock()'''
 			if(startTB==None):				
 				startTB=self.SearchStartingFlexibleTaskTimeBlock(tflex)
 				if(startTB==None):
@@ -335,13 +314,9 @@ class AllocationSpace():
 
 		while(pointer<len(self.space)):
 			if(timeRemaining<=0):
-				'''check kung meron pa'''
-
 				break
 
 			if(self.space[pointer].startTime<tflex.lowerbound and self.space[pointer].endTime>tflex.upperbound):
-				'''check kung pasok sa range'''
-
 				break
 			if(self.space[pointer].isFree() and self.space[pointer].span>timeRemaining):
 				'''split into two blocks'''
@@ -363,15 +338,6 @@ class AllocationSpace():
 		else:
 			pointer=counter
 		minPriority=self.space[pointer]
-		'''while(pointer<len(self.space)):
-			print self.space[pointer].startTime,tflex.upperbound
-			if(self.space[pointer].startTime>tflex.upperbound):
-				return minPriority.status
-			if(self.space[pointer].status!=None):
-				if(isinstance(self.space[pointer].status,FlexibleTask) and self.space[pointer].status.priority>minPriority.status.priority):
-					minPriority=self.space[pointer]	
-			pointer+=1
-		'''
 
 		for i in self.space:
 			if i.startTime >=tflex.lowerbound and i.startTime<tflex.upperbound:
@@ -410,9 +376,6 @@ class AllocationSpace():
 		pass
 
 	def Merge(self):
-		#def __init__(self,title,duration,mustart,mustend):
-	#	def __init__(self,startTime,endTime,span,status):		
-		#dagdag muna ng fix sa bawat end	
 		self.space.insert(0,TimeBlock(0,0,0,(FixTask("temp",0,0,0))))
 		self.space.append(TimeBlock(2400,0,0,(FixTask("temp",0,0,0))))
 		head=tail=0
@@ -434,18 +397,6 @@ class AllocationSpace():
 		self.space.pop()
 
 
-'''if __name__=="__main__":
-	AS=AllocationSpace("myTasks")
-	AS.AllocateTime(FlexibleTask("haha1",100,0,800,2400))
-	tflex=FlexibleTask("title",200,1,800,2000)
-	AS.AllocateTime(tflex)
-
-	AS.AllocateTime(FlexibleTask("haha2",100,0,0,2400))
-	#AS.AllocateTime(FlexibleTask("haha3",1100,0,0,2400))
-	#AS.AllocateTime(FlexibleTask("haha4",500,0,1300,1900))	
-	AS.AllocateTime(FlexibleTask("haha5",500,0,900,1400))	
-	AS.AllocateTimeFix(FixTask("haha6",200,1400,1600))				
-	AS.AllocateTimeFix(FixTask("haha6",200,900,	1100))	'''				
 
 
 
