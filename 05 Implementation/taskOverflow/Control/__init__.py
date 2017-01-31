@@ -1,6 +1,6 @@
 import sys
 import os
-import math
+import math 
 
 import Data.__init__ as Dat
 import UI.__init__ as UI
@@ -15,10 +15,11 @@ class AddTask():
 		'''check parameters of task'''
 
 		if isinstance(task,Dat.FixTask):
-			task.duration=task.duration-(task.duration%100)+int(math.ceil((task.duration%100)*(100.0/60)))	
-			task.mustart=task.mustart-(task.mustart%100)+int((task.mustart%100)*(100.0/60))
-			task.mustend=task.mustend-(task.mustend%100)+int(math.ceil((task.mustend%100)*(100.0/60)))	
+			task.duration=task.duration-(task.duration%100)+((task.duration%100)*(100.0/60))
+			task.mustart=task.mustart-(task.mustart%100)+(task.mustart%100)*(100.0/60)
+			task.mustend=task.mustend-(task.mustend%100)+((task.mustend%100)*(100.0/60))
 
+			print task.duration,task.mustart,task.mustend			
 			if(task.title==None):
 				print ("error you entered a task with no title") 
 				return False
@@ -34,20 +35,22 @@ class AddTask():
 			if(task.mustend<=task.mustart ):
 				print ('error your mustend must be greater muststart') 
 				return False
-			if(task.duration !=task.mustend-task.mustart ):
+			'''if(task.duration !=task.mustend-task.mustart ):
 				print (task.mustend,task.mustart)
 				print ('error your mustend must be greater muststart') 
-				return False		
+				return False	'''	
 
 
 
 			AllocationSpace.AllocateTimeFix(task)	
 	
 		elif isinstance(task,Dat.FlexibleTask):
-			task.duration=task.duration-(task.duration%100)+int(math.ceil((task.duration%100)*(100.0/60)))	
-			task.lowerbound=task.lowerbound-(task.lowerbound%100)+int(math.ceil((task.lowerbound%100)*(100.0/60)))
-			task.upperbound=task.upperbound-(task.upperbound%100)+int((task.upperbound%100)*(100.0/60))	
-			
+
+			task.duration=task.duration-(task.duration%100)+((task.duration%100)*(100.0/60))
+			task.lowerbound=task.lowerbound-(task.lowerbound%100)+((task.lowerbound%100)*(100.0/60))
+			task.upperbound=task.upperbound-(task.upperbound%100)+(task.upperbound%100)*(100.0/60)
+
+
 			if(task.title==None):
 				print ("error you entered a task with no title")
 				return False
@@ -98,6 +101,13 @@ class Menu():
 					priority=input("enter priority")
 					lowerbound=input("inter lowerbound\n")
 					upperbound=input("inter upperbound\n")
+
 					newT=Dat.FlexibleTask(title,duration,priority,lowerbound,upperbound)
 					newT=self.Allocator.addTask(newT,AllocationSpace)
+
+
+
+
+
+
 
