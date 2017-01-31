@@ -14,9 +14,9 @@ class AddTask():
 		'''check parameters of task'''
 
 		if isinstance(task,Dat.FixTask):
+			task.duration=task.duration-(task.duration%100)+int(math.ceil((task.duration%100)*(100.0/60)))	
 			task.mustart=task.mustart-(task.mustart%100)+int((task.mustart%100)*(100.0/60))
-			task.mustend=task.mustend-(task.mustend%100)+int((task.mustend%100)*(100.0/60))	
-			task.duration=task.mustend-task.mustart	
+			task.mustend=task.mustend-(task.mustend%100)+int(math.ceil((task.mustend%100)*(100.0/60)))	
 
 			if(task.title==None):
 				print ("error you entered a task with no title") 
@@ -43,10 +43,10 @@ class AddTask():
 			AllocationSpace.AllocateTimeFix(task)	
 	
 		elif isinstance(task,Dat.FlexibleTask):
-			task.lowerbound=task.lowerbound-(task.lowerbound%100)+int((task.lowerbound%100)*(100.0/60))
+			task.duration=task.duration-(task.duration%100)+int(math.ceil((task.duration%100)*(100.0/60)))	
+			task.lowerbound=task.lowerbound-(task.lowerbound%100)+int(math.ceil((task.lowerbound%100)*(100.0/60)))
 			task.upperbound=task.upperbound-(task.upperbound%100)+int((task.upperbound%100)*(100.0/60))	
-			task.duration=task.duration-(task.duration%100)+int((task.duration%100)*(100.0/60))	
-
+			
 			if(task.title==None):
 				print ("error you entered a task with no title")
 				return False
