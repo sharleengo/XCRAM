@@ -1,19 +1,19 @@
 '''
-Gerry Agluba Jr.
-This is a course requirement for CS192 Software Engineering II
-under the supervision of Asst. Prof. Ma.Rowena C. Solamo 
-of the Department of Computer Science, College of Engineering,
-University of the Philippines, Diliman for the AY 2016-2017
+	Gerry Agluba Jr.
+	This is a course requirement for CS192 Software Engineering II
+	under the supervision of Asst. Prof. Ma.Rowena C. Solamo 
+	of the Department of Computer Science, College of Engineering,
+	University of the Philippines, Diliman for the AY 2016-2017
 
-Gerry Agluba Jr.
-last updated on January 31,2017
-Initial Software for Data Classes , its structures and methods.
+	Gerry Agluba Jr.
+	last updated on January 31,2017
+	Initial Software for Data Classes , its structures and methods.
 
-File created on January 29,2017
-Developed by TaskOverflow group
+	File created on January 29,2017
+	Developed by TaskOverflow group
 
-This software serves as the primary Data Classes  of our 
-Software Project (Task OverFlow).
+	This software serves as the primary Data Classes  of our 
+	Software Project (Task OverFlow).
 
 '''
 
@@ -29,7 +29,7 @@ class Task():
 
 	'''method  __init__
 		created on January 29,2017
-
+		
 	'''
 
 class FixTask(Task):
@@ -61,27 +61,6 @@ class TimeBlock():
 			return True
 		else:
 			return False
-	def free(self):
-		del self
-	def Merge(self):
-		pass
-
-	def shouldSplit(self,newTask):
-		if(self.space>newTask.duration):
-			return True
-		else:
-			return False		
-	def split(self,newTask):
-		oldEndTime=self.endTime
-		self.endTime=self.startTime+newTask.duration
-		self.space=newTask.duration
-		self.status=newTask
-
-		'''create the new TB'''
-		newTimeBlock=TimeBlock(self.endTime+1,oldEndTime,oldEndTime-(self.endTime+1),None,self.next,self)
-		self.next=newTimeBlock
-		return newTimeBlock
-
 
 
 class AllocationSpace():
@@ -119,31 +98,39 @@ class AllocationSpace():
 	def AllocateTime(self,tflex):
 		print ("allocating",tflex.title,tflex.duration,tflex.lowerbound,tflex.upperbound)
 
-		oldSpace=self.space
-		
+		'''temp=self.space
+		oldSpace=temp
+		oldSpace=[]
+
+
+		for i in range(0,len(temp)):
+			tempTB=temp[i]
+			oldTB=tempTB
+			oldSpace.append(oldTB)'''
+		#tempSpace=self.space
+
+		#self.GetData()
+		#tempSpace=self.space
+		#oldSpace=tempSpace
+		oldSpace=[]
+		print (self.space)
+		for i in self.space:
+			j=TimeBlock(i.startTime,i.endTime,i.span,i.status)
+			oldSpace.append(j)
+		if(self.space==oldSpace):
+			print ("magkapareho")
+
+		#save
 		startTB=self.SearchStartingTimeBlock(tflex)
-		old=startTB
-		print (startTB.startTime,startTB.endTime)		
+
+
+
 		if(startTB==None):
 			startTB=self.SearchStartingFlexibleTaskTimeBlock(tflex)
 			if startTB==None:
 				print ("task cannot be allocated")
 				self.space=oldSpace
 				return False
-			'''else:
-				timeRemaining=tflex.duration
-				#while(timeRemaining>0):
-				tasktokick=self.LocateKick(self.space.index(startTB),tflex)
-				if(tasktokick==None):
-					return
-				else:
-					self.Kick(tasktokick)
-					self.Merge()
-					startTB=self.SearchStartingTimeBlock(tflex)					
-					print "startingBlock","\t",startTB.startTime,startTB.endTime
-					print self.priorityQueue'''
-
-		#print (startTB.startTime,startTB.endTime)
 
 		if(not startTB.isFree()):
 			tasktokick=self.LocateKick(self.space.index(startTB),tflex)
@@ -158,22 +145,23 @@ class AllocationSpace():
 
 		if(startTB.isEnough(tflex)):
 			if(self.inTheMiddle(startTB,tflex)):
-				print ("in the middle")
 				startTB=self.splitAndReturnMiddle(startTB,tflex)
 			elif(self.leftSided(startTB,tflex)):
-				print ("left")				
 				startTB=self.splitAndReturnLeft(startTB,tflex)
 			elif(self.rightSided(startTB,tflex)):
-				print ("right")	
 				startTB=self.splitAndReturnRight(startTB,tflex)			
 		timeRemaining=tflex.duration
 
 
+		for i in oldSpace:
+			print (i.status)
 		while(timeRemaining>0):
-
+			print ("timeRemaining",timeRemaining)
 			if(startTB==None):				
 				startTB=self.SearchStartingFlexibleTaskTimeBlock(tflex)
 				if(startTB==None):
+					for i in oldSpace:
+						print (i.status)
 					self.space=oldSpace
 					print ("cannot Allocate")
 					return False
@@ -186,32 +174,32 @@ class AllocationSpace():
 					else:
 						self.Kick(tasktokick)
 						self.Merge()
-						startTB=self.SearchStartingTimeBlock(tflex)
-						print ("anditio ka ba")
-						#timeRemaining=self.AllocateMaxTime(self.space.index(startTB),tflex,timeRemaining)	
+						
 
-						startTB=self.SearchStartingTimeBlock(tflex)
 			else:
-
 				timeRemaining=self.AllocateMaxTime(self.space.index(startTB),tflex,timeRemaining)
-				oldstartTb=startTB
-				startTB=self.SearchStartingTimeBlock(tflex)				
 
-				if(oldstartTb==startTB):
-					self.Merge()
-					startTB=None
-					self.space=oldSpace
-					print ("task is not allocated")
-					return False
+				self.Merge()
+				#oldstartTb=startTB
+				#startTB=self.SearchStartingTimeBlock(tflex)			
+				
+				#if(oldstartTb==startTB or startTB==None):
+				#	self.Merge()
+				#	startTB=None
+
+				#	self.Merge()
+					#self.GetData()
+				#	print ("task is not allocated")
+				#	return False
+
+			startTB=self.SearchStartingTimeBlock(tflex)
+		for i in self.space:
+			print ("true")
+			if i.status in self.priorityQueue:
+				self.Kick(i)
 
 		print ("Task Allocated is a success")
-		'''startTB=old
-		if(self.maxPriority==None):
-			self.maxPriority=startTB.status.priority
-		else:
-			if(self.maxPriority>startTB.status.priority):
-				self.maxPriority=startTB.status.priority'''
-		#self.GetData()
+
 		self.Merge()
 		return True
 	def AllocateTimeFix(self,tfix):
@@ -228,18 +216,21 @@ class AllocationSpace():
 				elif(self.rightSided(startTB,tfix)):
 					print ("right")	
 					startTB=self.splitAndReturnRight(startTB,tfix)			
-			#self.Merge()
 		elif startTB==None:
 			print ("None")
 			TBtokick=self.LocateKickFix(tfix)
 			tasktokick=[]
 			totalspan=0
-			print (TBtokick)			
+
 			for i in TBtokick:
 				totalspan+=i.span
 				tasktokick.append(i.status.title)
+			for i in self.space:
+				if i.status!=None:
+					if i.status.title in tasktokick:
+						self.Kick(i.status)
 			if(totalspan<tfix.duration):
-				print ("not enoug space, cannot be allocated")
+				print ("not enough space, cannot be allocated")
 				return 
 			else:
 				for i in self.space:
@@ -247,17 +238,14 @@ class AllocationSpace():
 					if(isinstance(i.status,FlexibleTask)):
 						if i.status.title in tasktokick:
 							self.Kick(i.status)
+			self.Merge()
 			startTB=self.SearchStartingTimeBlock(tfix)
 			#print (startTB.startTime)
 			if(self.inTheMiddle(startTB,tfix)):
-				print ("in the middle")
 				tartTB=self.splitAndReturnMiddle(startTB,tfix)
 			elif(self.leftSided(startTB,tfix)):
-				print ("left")				
 				startTB=self.splitAndReturnLeft(startTB,tfix)
-				print (startTB.startTime,startTB.endTime)
 			elif(self.rightSided(startTB,tfix)):
-				print ("right")	
 				startTB=self.splitAndReturnRight(startTB,tfix)			
 		index=self.space.index(startTB)	
 		self.space[index].status=tfix	
@@ -377,6 +365,7 @@ class AllocationSpace():
 
 
 	def AllocateMaxTime(self,counter,tflex,timeRemaining):
+
 		pointer=counter
 		timeRemaining=timeRemaining
 		if pointer<0:
@@ -403,6 +392,8 @@ class AllocationSpace():
 				self.space[pointer].status=tflex
 				timeRemaining-=self.space[pointer].span
 			pointer+=1
+		#print ("after allocation")
+		#self.GetData()
 		return timeRemaining
 
 
@@ -427,15 +418,22 @@ class AllocationSpace():
 		tokick=[]
 		for i in self.space:
 			if (isinstance(i.status,FlexibleTask)):
-				print (i.startTime,i.endTime)
-				if(i.startTime<= tfix.mustart and i.endTime>tfix.mustend):
+				'''if(i.startTime<= tfix.mustart and i.endTime>tfix.mustend):
 					tokick.append(i)
 				elif(i.startTime<tfix.mustart and i.endTime>=tfix.mustend):
 					tokick.append(i)
 				elif(i.startTime>tfix.mustart and i.endTime<tfix.mustend):
 					tokick.append(i)
 				elif(i.startTime==tfix.mustart and i.endTime==tfix.mustend):
-					tokick.append(i)					
+					tokick.append(i)'''
+
+				if(i.startTime >= tfix.mustart and i.startTime<tfix.mustend):
+
+					tokick.append(i)										
+				if(i.endTime <= tfix.mustend and i.endTime>tfix.mustart):
+					tokick.append(i)
+		for i in tokick:
+			print (i.startTime)
 		return tokick
 
 
@@ -485,5 +483,13 @@ class AllocationSpace():
 
 
 if __name__=="__main__":
+	#myAS=AllocationSpace("")
+	#myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
+	#myAS.AllocateTimeFix(FixTask("B",500,500,1000))	
+	#myAS.GetData()
+	#myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
+	#myAS.GetData()	
+	#for i in myAS.priorityQueue:
+	#	myAS.AllocateTime(i[1])
+
 	pass
-			
