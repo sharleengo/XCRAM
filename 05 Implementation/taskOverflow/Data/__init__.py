@@ -100,7 +100,7 @@ class AllocationSpace():
 			endTime=i.endTime-(i.endTime%100)+(i.endTime%100)*(60.0/100)
 			span=i.span-(i.span%100)+(i.span%100)*(60.0/100)		
 			#i.spa
-			print ("\n",startTime,"\t",endTime,"\t",span,end="\t")
+			print ("\n",int(startTime),"\t",int(endTime),"\t",int(span),end="\t")
 			if isinstance(i.status,FlexibleTask):
 				print (i.status.title,i.status.priority)
 			elif isinstance(i.status,FixTask):	
