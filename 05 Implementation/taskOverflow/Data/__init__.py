@@ -1,3 +1,22 @@
+'''
+Gerry Agluba Jr.
+This is a course requirement for CS192 Software Engineering II
+under the supervision of Asst. Prof. Ma.Rowena C. Solamo 
+of the Department of Computer Science, College of Engineering,
+University of the Philippines, Diliman for the AY 2016-2017
+
+Gerry Agluba Jr.
+last updated on January 31,2017
+Initial Software for Data Classes , its structures and methods.
+
+File created on January 29,2017
+Developed by TaskOverflow group
+
+This software serves as the primary Data Classes  of our 
+Software Project (Task OverFlow).
+
+'''
+
 from __future__ import print_function
 
 import heapq
@@ -7,6 +26,11 @@ class Task():
 	def __init__(self, title,duration):
 		self.title=title
 		self.duration=duration
+
+	'''method  __init__
+		created on January 29,2017
+
+	'''
 
 class FixTask(Task):
 	def __init__(self,title,duration,mustart,mustend):
@@ -72,9 +96,10 @@ class AllocationSpace():
 
 	def GetData(self):
 		for i in self.space:
-			startTime=i.startTime-(i.startTime%100)+int((i.startTime%100)*(60.0/100))
-			endTime=i.endTime-(i.endTime%100)+int((i.endTime%100)*(60.0/100))	
-			span=i.span-(i.span%100)+int((i.span%100)*(60.0/100))
+			startTime=i.startTime-(i.startTime%100)+(i.startTime%100)*(60.0/100)
+			endTime=i.endTime-(i.endTime%100)+(i.endTime%100)*(60.0/100)
+			span=i.span-(i.span%100)+(i.span%100)*(60.0/100)		
+			#i.spa
 			print ("\n",startTime,"\t",endTime,"\t",span,end="\t")
 			if isinstance(i.status,FlexibleTask):
 				print (i.status.title,i.status.priority)
