@@ -9,32 +9,44 @@ import UI.__init__ as UI
 
 class AddTask():
 	def __init__(self):
-		self.title=None
+		pass
 	def addTask(self,task,AllocationSpace):
 		'''check parameters of task'''
 
 		if isinstance(task,Dat.FixTask):
+			task.mustart=task.mustart-(task.mustart%100)+int((task.mustart%100)*(100.0/60))
+			task.mustend=task.mustend-(task.mustend%100)+int((task.mustend%100)*(100.0/60))	
+			task.duration=task.mustend-task.mustart	
+
 			if(task.title==None):
 				print ("error you entered a task with no title") 
 				return False
 			if(task.duration==None):
 				print ("error you entered a task with no duration") 
 				return False
-			if(task.muststart<0 or task.muststart>=2400 ):
+			if(task.mustart<0 or task.mustart>=2400 ):
 				print ('error your mustart must lie from 0 to not higher than 2400') 
 				return False
 			if(task.mustend<=0 or task.mustend>2400 ):
 				print ('error your mustend must be greater than 0 but not higher than 2400') 
 				return False
-			if(task.mustend<=task.muststart ):
+			if(task.mustend<=task.mustart ):
 				print ('error your mustend must be greater muststart') 
 				return False
-			if(duration !=task.mustend-task.muststart ):
+			if(task.duration !=task.mustend-task.mustart ):
+				print (task.mustend,task.mustart)
 				print ('error your mustend must be greater muststart') 
-				return False				
-			AllocationSpace.AllocateTimeFix(task)				
+				return False		
+
+
+
+			AllocationSpace.AllocateTimeFix(task)	
 	
 		elif isinstance(task,Dat.FlexibleTask):
+			task.lowerbound=task.lowerbound-(task.lowerbound%100)+int((task.lowerbound%100)*(100.0/60))
+			task.upperbound=task.upperbound-(task.upperbound%100)+int((task.upperbound%100)*(100.0/60))	
+			task.duration=task.duration-(task.duration%100)+int((task.duration%100)*(100.0/60))	
+
 			if(task.title==None):
 				print ("error you entered a task with no title")
 				return False
@@ -47,13 +59,19 @@ class AddTask():
 			if(task.upperbound<=0 or task.upperbound>2400 ):
 				print ('error your upperbound must be greater than 0 but not higher than 2400') 
 				return False
-			if(task.lowerbound<=task.upperbound ):
+			if(task.lowerbound>=task.upperbound ):
 				print ('error your upperbound must be greater lowerbound') 
 				return False
 			if(task.priority<0):
 				print ('error entered number is not allowed') 
 				return False
+
+
 			AllocationSpace.AllocateTime(task)
+
+		for i in AllocationSpace.priorityQueue:
+			if(AllocationSpace.AllocateTime(i[1])):
+				AllocationSpace.priorityQueue.pop()
 
 class Menu():
 	def __init__(self):
@@ -61,14 +79,14 @@ class Menu():
 
 	def ActiveState(self,AllocationSpace):
 		while(True):
-			os.system('cls')
+			#os.system('cls')
 			AllocationSpace.GetData()		
 			print ("[A].Add task\n")
 			event=raw_input("")
 			if(event=="A"):
 				newT=None
 				title=raw_input("enter task title\n")
-				duration=raw_input("enter duration\n")
+				duration=input("enter duration\n")
 				ttype=input("enter task type\n[1].Fix Task \t[2].Flexible Task\n")
 				if(ttype==1):
 					mustart=input("enter start time\n")
@@ -81,10 +99,4 @@ class Menu():
 					upperbound=input("inter upperbound\n")
 					newT=Dat.FlexibleTask(title,duration,priority,lowerbound,upperbound)
 					newT=self.Allocator.addTask(newT,AllocationSpace)
-
-
-
-
-
-
 
