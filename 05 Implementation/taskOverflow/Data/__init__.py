@@ -177,12 +177,13 @@ class AllocationSpace():
 						
 
 			else:
+				print ("im here",startTB.startTime,startTB.endTime)
 				timeRemaining=self.AllocateMaxTime(self.space.index(startTB),tflex,timeRemaining)
 				print ("adad")
 
 				self.Merge()
 				oldstartTb=startTB
-				startTB=self.SearchStartingTimeBlock(tflex)	
+				startTB=self.SearchStartingTimeBlock(tflex)
 
 
 				if( startTB==None):
@@ -195,6 +196,7 @@ class AllocationSpace():
 					print ("task is not allocated")
 					return False
 				elif( startTB.startTime==oldstartTb.startTime):
+					print (startTB.startTime)
 					self.space=oldSpace
 					self.Merge()
 					startTB=None
@@ -205,10 +207,7 @@ class AllocationSpace():
 					return False					
 
 			startTB=self.SearchStartingTimeBlock(tflex)
-		for i in self.space:
-			print ("true")
-			if i.status in self.priorityQueue:
-				self.Kick(i)
+
 
 		print ("Task Allocated is a success")
 
@@ -267,10 +266,17 @@ class AllocationSpace():
 	def SearchStartingTimeBlock(self,tflex):
 		if isinstance(tflex,FlexibleTask):
 			for i in self.space:
+				print (i.startTime)
 				if(i.isFree() and i.startTime>=tflex.lowerbound and i.startTime<tflex.upperbound and i.span>=tflex.duration and tflex.upperbound-i.startTime>=tflex.duration):
 					#self.GetData()
 					print ("dasdasdasd",i.startTime,i.endTime)
 					return i				
+				if (i.isFree() and  i.startTime>=tflex.lowerbound and i.startTime<=i.endTime):
+					return i
+				if (i.isFree() and  i.startTime>=tflex.lowerbound and i.startTime<i.endTime):
+					return i					
+				if (i.isFree() and  i.endTime>tflex.lowerbound and i.startTime<=i.endTime):
+					return i										
 
 			for i in self.space:
 				if(i.isFree() and i.endTime>tflex.lowerbound and i.startTime<tflex.upperbound):
@@ -399,6 +405,7 @@ class AllocationSpace():
 				self.space[pointer].endTime=newTB.startTime
 				self.space[pointer].span=self.space[pointer].endTime-self.space[pointer].startTime
 				self.space.insert(pointer+1,newTB)
+				self.GetData()
 
 			if (self.space[pointer].isFree() and self.space[pointer].startTime>=tflex.lowerbound and self.space[pointer].endTime<=tflex.upperbound):
 				self.space[pointer].status=tflex
@@ -498,13 +505,14 @@ class AllocationSpace():
 
 if __name__=="__main__":
 	myAS=AllocationSpace("")
-	myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
+	#myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
 	myAS.AllocateTimeFix(FixTask("B",500,200,700))	
 	myAS.GetData()
-	myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
+	myAS.AllocateTime(FlexibleTask("A",800,1,0,1300))
+	myAS.GetData()	
 	#myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
 	#myAS.GetData()	
 	#for i in myAS.priorityQueue:
 	#	myAS.AllocateTime(i[1])
 
-	pass
+	#pass
