@@ -178,19 +178,31 @@ class AllocationSpace():
 
 			else:
 				timeRemaining=self.AllocateMaxTime(self.space.index(startTB),tflex,timeRemaining)
+				print ("adad")
 
 				self.Merge()
-				#oldstartTb=startTB
-				#startTB=self.SearchStartingTimeBlock(tflex)			
-				
-				#if(oldstartTb==startTB or startTB==None):
-				#	self.Merge()
-				#	startTB=None
+				oldstartTb=startTB
+				startTB=self.SearchStartingTimeBlock(tflex)	
 
-				#	self.Merge()
+
+				if( startTB==None):
+					self.space=oldSpace
+					self.Merge()
+					startTB=None
+
+					self.Merge()
 					#self.GetData()
-				#	print ("task is not allocated")
-				#	return False
+					print ("task is not allocated")
+					return False
+				elif( startTB.startTime==oldstartTb.startTime):
+					self.space=oldSpace
+					self.Merge()
+					startTB=None
+
+					self.Merge()
+					#self.GetData()
+					print ("task is not allocated")
+					return False					
 
 			startTB=self.SearchStartingTimeBlock(tflex)
 		for i in self.space:
@@ -432,6 +444,8 @@ class AllocationSpace():
 					tokick.append(i)										
 				if(i.endTime <= tfix.mustend and i.endTime>tfix.mustart):
 					tokick.append(i)
+				if(i.startTime<tfix.mustart and i.endTime>tfix.mustend) :
+					tokick.append(i)
 		for i in tokick:
 			print (i.startTime)
 		return tokick
@@ -483,10 +497,11 @@ class AllocationSpace():
 
 
 if __name__=="__main__":
-	#myAS=AllocationSpace("")
-	#myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
-	#myAS.AllocateTimeFix(FixTask("B",500,500,1000))	
-	#myAS.GetData()
+	myAS=AllocationSpace("")
+	myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
+	myAS.AllocateTimeFix(FixTask("B",500,200,700))	
+	myAS.GetData()
+	myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
 	#myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
 	#myAS.GetData()	
 	#for i in myAS.priorityQueue:
