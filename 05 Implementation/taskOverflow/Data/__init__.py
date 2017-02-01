@@ -240,6 +240,8 @@ class AllocationSpace():
 				if i.status!=None:
 					if i.status.title in tasktokick:
 						self.Kick(i.status)
+				if i.status==None:
+					totalspan+=i.span
 			if(totalspan<tfix.duration):
 				print ("not enough space, cannot be allocated")
 				return 
@@ -252,15 +254,17 @@ class AllocationSpace():
 			self.Merge()
 			startTB=self.SearchStartingTimeBlock(tfix)
 			#print (startTB.startTime)
-			if(self.inTheMiddle(startTB,tfix)):
+
+			'''if(self.inTheMiddle(startTB,tfix)):
 				tartTB=self.splitAndReturnMiddle(startTB,tfix)
 			elif(self.leftSided(startTB,tfix)):
 				startTB=self.splitAndReturnLeft(startTB,tfix)
 			elif(self.rightSided(startTB,tfix)):
-				startTB=self.splitAndReturnRight(startTB,tfix)			
-		index=self.space.index(startTB)	
-		self.space[index].status=tfix	
-		self.Merge()
+				startTB=self.splitAndReturnRight(startTB,tfix)			'''
+		if(startTB!=None):
+			index=self.space.index(startTB)	
+			self.space[index].status=tfix	
+			self.Merge()
 		#self.GetData()
 
 	def SearchStartingTimeBlock(self,tflex):
@@ -449,9 +453,9 @@ class AllocationSpace():
 				if(i.startTime >= tfix.mustart and i.startTime<tfix.mustend):
 
 					tokick.append(i)										
-				if(i.endTime <= tfix.mustend and i.endTime>tfix.mustart):
+				elif(i.endTime <= tfix.mustend and i.endTime>tfix.mustart):
 					tokick.append(i)
-				if(i.startTime<tfix.mustart and i.endTime>tfix.mustend) :
+				elif(i.startTime<tfix.mustart and i.endTime>tfix.mustend) :
 					tokick.append(i)
 		for i in tokick:
 			print (i.startTime)
@@ -506,10 +510,18 @@ class AllocationSpace():
 if __name__=="__main__":
 	myAS=AllocationSpace("")
 	#myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
-	myAS.AllocateTimeFix(FixTask("B",500,200,700))	
+	myAS.AllocateTime(FlexibleTask("A",300,1,400,700))	
+	#myAS.AllocateTime(FlexibleTask("B",100,1,1000,1100))		
+
+	#myAS.AllocateTimeFix(FixTask("D",100,1100,1200))		
+	myAS.AllocateTimeFix(FixTask("E",100,700,800))			
+	myAS.AllocateTimeFix(FixTask("F",200,600,800))			
+	#myAS.AllocateTimeFix(FixTask("D",100,700,800))		
+	#myAS.AllocateTimeFix(FixTask("D",200,600,800))				
+	#myAS.GetData()
+	for i in myAS.priorityQueue:
+		myAS.AllocateTime(i[1])
 	myAS.GetData()
-	myAS.AllocateTime(FlexibleTask("A",800,1,0,1300))
-	myAS.GetData()	
 	#myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
 	#myAS.GetData()	
 	#for i in myAS.priorityQueue:
