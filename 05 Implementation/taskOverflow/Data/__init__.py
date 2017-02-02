@@ -1,19 +1,41 @@
 '''
-	Gerry Agluba Jr.
-	This is a course requirement for CS192 Software Engineering II
-	under the supervision of Asst. Prof. Ma.Rowena C. Solamo 
-	of the Department of Computer Science, College of Engineering,
-	University of the Philippines, Diliman for the AY 2016-2017
+MIT License
 
-	Gerry Agluba Jr.
-	last updated on January 31,2017
-	Initial Software for Data Classes , its structures and methods.
+Copyright (c) 2017 Gerry P. Agluba Jr.
 
-	File created on January 29,2017
-	Developed by TaskOverflow group
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-	This software serves as the primary Data Classes  of our 
-	Software Project (Task OverFlow).
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+This is a course requirement for CS192 Software Engineering II
+under the supervision of Asst. Prof. Ma.Rowena C. Solamo 
+of the Department of Computer Science, College of Engineering,
+University of the Philippines, Diliman for the AY 2016-2017
+
+Gerry Agluba Jr.
+last updated on January 31,2017
+Initial Software for Data Classes , its structures and methods.
+
+File created on January 29,2017.
+Developed by TaskOverflow group.
+
+This software serves as the primary Data Classes  of our 
+Software Project (Task OverFlow).
 
 '''
 
@@ -27,10 +49,6 @@ class Task():
 		self.title=title
 		self.duration=duration
 
-	'''method  __init__
-		created on January 29,2017
-		
-	'''
 
 class FixTask(Task):
 	def __init__(self,title,duration,mustart,mustend):
@@ -45,23 +63,46 @@ class FlexibleTask(Task):
 		self.lowerbound=lowerbound
 		self.upperbound=upperbound
 
+
 class TimeBlock():
 	def __init__(self,startTime,endTime,span,status):
 		self.startTime=startTime
 		self.endTime=endTime
 		self.span=span
 		self.status=status
+
+
+	'''	
+		method  isFree
+		created January 29,2017
+
+		This method is a method of the TimeBlock class.
+		It returns a boolen value. It returns True if a Timeblock's status is  None.Otherwise, it returns false. 
+		This method has no paramater aside from the Timeblock itself.
+	'''
 	def isFree(self):
 		if self.status==None:
 			return True
 		else:
 			return False
+
+
+	'''	
+		method  isFree
+		created January 29,2017
+
+		This method is a method of the TimeBlock class.
+		It returns a boolen value. It returns True if a the TimeBlock's span is enough for a Task type parameter.
+		it returns false otherwise.
+		This method has paramater newTask of type Task.
+	'''
 	def isEnough(self,newTask):
 		if(self.span>=newTask.duration):
 			return True
 		else:
 			return False
 
+	
 
 class AllocationSpace():
 
@@ -73,6 +114,15 @@ class AllocationSpace():
 		self.maxPriority=None
 
 
+
+	'''	
+		method  isFree
+		created January 29,2017
+
+		This method is a method of the AllocationSpace class.
+		It does not return anything, but it is responsible for displaying data involved in the class AllocationSpace.
+		The formal parameter name is of type String
+	'''
 	def GetData(self):
 		for i in self.space:
 			startTime=i.startTime-(i.startTime%100)+(i.startTime%100)*(60.0/100)
@@ -89,29 +139,20 @@ class AllocationSpace():
 		print ("\nPriorityQueue\t ")
 		for i  in self.priorityQueue:
 			print (i[1].title,"\t",i[1].priority)
-
-
-	
 		print ("\n")
 
 
+	'''method AllocateTime
+		created January 29,2017	
+
+		This method is the core Allocation Algorithm for flexible tasks. 
+		It returns a boolean value True if the allocation is successful, otherwise False.
+		The formal parameter tflex is of type FlexibleTask.
+	'''
 	def AllocateTime(self,tflex):
 		print ("allocating",tflex.title,tflex.duration,tflex.lowerbound,tflex.upperbound)
 
-		'''temp=self.space
-		oldSpace=temp
-		oldSpace=[]
-
-
-		for i in range(0,len(temp)):
-			tempTB=temp[i]
-			oldTB=tempTB
-			oldSpace.append(oldTB)'''
-		#tempSpace=self.space
-
-		#self.GetData()
-		#tempSpace=self.space
-		#oldSpace=tempSpace
+		#saving current data...
 		oldSpace=[]
 		print (self.space)
 		for i in self.space:
@@ -120,11 +161,10 @@ class AllocationSpace():
 		if(self.space==oldSpace):
 			print ("magkapareho")
 
-		#save
+		#search for possible TimeBlocks.
 		startTB=self.SearchStartingTimeBlock(tflex)
 
-
-
+		#search for timeblock that has lower priority.
 		if(startTB==None):
 			startTB=self.SearchStartingFlexibleTaskTimeBlock(tflex)
 			if startTB==None:
@@ -132,6 +172,7 @@ class AllocationSpace():
 				self.space=oldSpace
 				return False
 
+		#if startTB is not free, then locate for possible kicks.
 		if(not startTB.isFree()):
 			tasktokick=self.LocateKick(self.space.index(startTB),tflex)
 			if(tasktokick==None):
@@ -143,6 +184,7 @@ class AllocationSpace():
 				self.Merge()
 				startTB=self.SearchStartingTimeBlock(tflex)	
 
+		#if TimeBLock is enough, do possible splitting
 		if(startTB.isEnough(tflex)):
 			if(self.inTheMiddle(startTB,tflex)):
 				startTB=self.splitAndReturnMiddle(startTB,tflex)
@@ -153,8 +195,11 @@ class AllocationSpace():
 		timeRemaining=tflex.duration
 
 
+
 		for i in oldSpace:
 			print (i.status)
+
+		#Allocate tasks.
 		while(timeRemaining>0):
 			print ("timeRemaining",timeRemaining)
 			if(startTB==None):				
@@ -177,10 +222,7 @@ class AllocationSpace():
 						
 
 			else:
-				print ("im here",startTB.startTime,startTB.endTime)
 				timeRemaining=self.AllocateMaxTime(self.space.index(startTB),tflex,timeRemaining)
-				print ("adad")
-
 				self.Merge()
 				oldstartTb=startTB
 				startTB=self.SearchStartingTimeBlock(tflex)
@@ -213,22 +255,30 @@ class AllocationSpace():
 
 		self.Merge()
 		return True
+	
+
+	'''method AllocateTimeFix
+		created January 29,2017	
+
+		This method is the core Allocation Algorithm for fix tasks. 
+		It returns a boolean value True if the allocation is successful, otherwise False.
+		The formal parameter tfix is of type FixTask.
+	'''
 	def AllocateTimeFix(self,tfix):
+
 		startTB=self.SearchStartingTimeBlock(tfix)
 		if startTB!=None:
 			if(startTB.isEnough(tfix)):
 				if(self.inTheMiddle(startTB,tfix)):
-					print ("in the middle")
+					#print ("in the middle")
 					tartTB=self.splitAndReturnMiddle(startTB,tfix)
 				elif(self.leftSided(startTB,tfix)):
-					print ("left")				
+					#print ("left")				
 					startTB=self.splitAndReturnLeft(startTB,tfix)
-					#print (startTB.startTime,startTB.endTime)
 				elif(self.rightSided(startTB,tfix)):
-					print ("right")	
+					#print ("right")	
 					startTB=self.splitAndReturnRight(startTB,tfix)			
 		elif startTB==None:
-			print ("None")
 			TBtokick=self.LocateKickFix(tfix)
 			tasktokick=[]
 			totalspan=0
@@ -244,7 +294,7 @@ class AllocationSpace():
 					totalspan+=i.span
 			if(totalspan<tfix.duration):
 				print ("not enough space, cannot be allocated")
-				return 
+				return False
 			else:
 				for i in self.space:
 					#print ("im heres")
@@ -253,27 +303,33 @@ class AllocationSpace():
 							self.Kick(i.status)
 			self.Merge()
 			startTB=self.SearchStartingTimeBlock(tfix)
-			#print (startTB.startTime)
 
-			'''if(self.inTheMiddle(startTB,tfix)):
-				tartTB=self.splitAndReturnMiddle(startTB,tfix)
-			elif(self.leftSided(startTB,tfix)):
-				startTB=self.splitAndReturnLeft(startTB,tfix)
-			elif(self.rightSided(startTB,tfix)):
-				startTB=self.splitAndReturnRight(startTB,tfix)			'''
 		if(startTB!=None):
 			index=self.space.index(startTB)	
 			self.space[index].status=tfix	
 			self.Merge()
+
+		print "Allocation Successful."
+		return True
 		#self.GetData()
 
+
+
+	'''method SearchStartingTimeBlock
+		created January 29,2017	
+
+		This method is responsible in searcheing for possible Free TimeBlock 
+		that is contained in the bounds in case of Flexible tasks,
+		and a Free TimeBlock contained in the mustart and mustend of a fixed task. 
+		It returns a value of type TimeBlock in case the search is successful, otherwise it returns None.
+		The formal parameter  tflex is of type Task.
+	'''
 	def SearchStartingTimeBlock(self,tflex):
 		if isinstance(tflex,FlexibleTask):
 			for i in self.space:
 				print (i.startTime)
 				if(i.isFree() and i.startTime>=tflex.lowerbound and i.startTime<tflex.upperbound and i.span>=tflex.duration and tflex.upperbound-i.startTime>=tflex.duration):
 					#self.GetData()
-					print ("dasdasdasd",i.startTime,i.endTime)
 					return i				
 				if (i.isFree() and  i.startTime>=tflex.lowerbound and i.startTime<=i.endTime):
 					return i
@@ -292,6 +348,16 @@ class AllocationSpace():
 					return i
 			return None
 
+
+	'''method SearchStartingFlexibleTaskTimeBlock
+		created January 29,2017	
+
+		This method is responsible in searching for possible Free TimeBlock of status flexibleTask 
+		that is contained in the bounds in of tflex. This method is used when SearchStartingTimeBlock method
+		fails.
+		It returns a value of type TimeBlock in case the search is successful, otherwise it returns None.
+		The formal parameter is of tflex is of type FlexibleTask.
+	'''
 	def SearchStartingFlexibleTaskTimeBlock(self,tflex):
 		for i in self.space:
 			if(isinstance(i.status,FlexibleTask) and i.endTime>tflex.lowerbound and i.startTime<tflex.upperbound):
@@ -299,6 +365,15 @@ class AllocationSpace():
 					return i
 
 		return None
+
+
+	'''method inTheMiddle
+		created January 29,2017	
+
+		This method checks if a task is contained between span of a timeblock.
+		It returns True if such condition is satisfied, Otherwise it returns false.
+		Formal parameters are startTB and tflex of type TimeBlock and Task respectively.
+	'''
 	def inTheMiddle(self,startTB,tflex):
 
 		if isinstance(tflex,FlexibleTask):
@@ -312,6 +387,14 @@ class AllocationSpace():
 			else:
 				return False			
 
+
+	'''method leftSided
+		created January 29,2017	
+
+		This method checks if a task is on the left side of the span of a timeblock.
+		It returns True if such condition is satisfied, Otherwise it returns false.
+		Formal parameters are startTB and tflex of type TimeBlock and Task respectively.
+	'''
 	def leftSided(self,startTB,tflex):
 		if isinstance(tflex,FlexibleTask):
 			if startTB.span>tflex.duration and startTB.startTime==tflex.lowerbound and startTB.endTime>tflex.upperbound:		
@@ -324,6 +407,14 @@ class AllocationSpace():
 			else:
 				return False						
 	
+
+	'''method rightSided
+		created January 29,2017	
+
+		This method checks if a task is on the right side of the span of a timeblock.
+		It returns True if such condition is satisfied, Otherwise it returns false.
+		Formal parameters are startTB and tflex of type TimeBlock and Task respectively.
+	'''
 	def rightSided(self,startTB,tflex):
 		if isinstance(tflex,FlexibleTask):		
 			if startTB.span>tflex.duration and startTB.startTime<tflex.lowerbound and startTB.endTime==tflex.upperbound:		
@@ -337,11 +428,20 @@ class AllocationSpace():
 				return False						
 
 	
+	'''method exactlyFitted
+		created January 29,2017	
+
+		This method checks if a task exactly contained in the  span of a timeblock.
+		It returns True if such condition is satisfied, Otherwise it returns false.
+		Formal parameters are startTB and tflex of type TimeBlock and Task respectively.
+	'''	
 	def exactlyFitted(self,startTB,tflex):
 		if startTB.span==tflex.duration and startTB.startTime==tflex.lowerbound and startTB.endTime==tflex.upperbound:		
 			return True
 		else:
 			return False
+
+
 
 	def splitAndReturnMiddle(self,startTB,tflex):
 		index=self.space.index(startTB)
@@ -508,23 +608,8 @@ class AllocationSpace():
 
 
 if __name__=="__main__":
-	myAS=AllocationSpace("")
+	#myAS=AllocationSpace("")
 	#myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
-	myAS.AllocateTime(FlexibleTask("A",300,1,400,700))	
+	#myAS.AllocateTime(FlexibleTask("A",300,1,400,700))	
 	#myAS.AllocateTime(FlexibleTask("B",100,1,1000,1100))		
-
-	#myAS.AllocateTimeFix(FixTask("D",100,1100,1200))		
-	myAS.AllocateTimeFix(FixTask("E",100,700,800))			
-	myAS.AllocateTimeFix(FixTask("F",200,600,800))			
-	#myAS.AllocateTimeFix(FixTask("D",100,700,800))		
-	#myAS.AllocateTimeFix(FixTask("D",200,600,800))				
-	#myAS.GetData()
-	for i in myAS.priorityQueue:
-		myAS.AllocateTime(i[1])
-	myAS.GetData()
-	#myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
-	#myAS.GetData()	
-	#for i in myAS.priorityQueue:
-	#	myAS.AllocateTime(i[1])
-
-	#pass
+	pass
