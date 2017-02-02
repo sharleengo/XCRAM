@@ -28,7 +28,7 @@ of the Department of Computer Science, College of Engineering,
 University of the Philippines, Diliman for the AY 2016-2017
 
 Gerry Agluba Jr.
-last updated on January 31,2017
+last updated on February 2,2017
 Initial Software for Data Classes , its structures and methods.
 
 File created on January 29,2017.
