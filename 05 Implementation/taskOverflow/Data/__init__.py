@@ -309,7 +309,7 @@ class AllocationSpace():
 			self.space[index].status=tfix	
 			self.Merge()
 
-		print "Allocation Successful."
+		print ("Allocation Successful.")
 		return True
 		#self.GetData()
 
