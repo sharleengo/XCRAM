@@ -15,6 +15,11 @@ class AddTask():
 		'''check parameters of task'''
 
 		if isinstance(task,Dat.FixTask):
+
+			print (task.mustart,task.mustend,task.duration)
+			if(task.mustart%100 > 59 or task.mustend%100>59 or task.duration%100>59):
+				print ("invalid time input")
+				return False
 			task.duration=task.duration-(task.duration%100)+((task.duration%100)*(100.0/60))
 			task.mustart=task.mustart-(task.mustart%100)+(task.mustart%100)*(100.0/60)
 			task.mustend=task.mustend-(task.mustend%100)+((task.mustend%100)*(100.0/60))
@@ -26,6 +31,9 @@ class AddTask():
 			if(task.duration==None):
 				print ("error you entered a task with no duration") 
 				return False
+			if(task.duration<=0):
+				print ("error duration must be greater than 0") 
+				return False				
 			if(task.mustart<0 or task.mustart>=2400 ):
 				print ('error your mustart must lie from 0 to not higher than 2400') 
 				return False
@@ -35,16 +43,17 @@ class AddTask():
 			if(task.mustend<=task.mustart ):
 				print ('error your mustend must be greater muststart') 
 				return False
-			'''if(task.duration !=task.mustend-task.mustart ):
-				print (task.mustend,task.mustart)
+			if(task.duration !=task.mustend-task.mustart ):
 				print ('error your mustend must be greater muststart') 
-				return False	'''	
+				return False	
 
 
 
 			AllocationSpace.AllocateTimeFix(task)	
 	
 		elif isinstance(task,Dat.FlexibleTask):
+			if(task.lowerbound%100 > 59 or task.upperbound%100>59 or task.duration%59>100):
+				print ("invalid time input")				
 
 			task.duration=task.duration-(task.duration%100)+((task.duration%100)*(100.0/60))
 			task.lowerbound=task.lowerbound-(task.lowerbound%100)+((task.lowerbound%100)*(100.0/60))
@@ -57,6 +66,10 @@ class AddTask():
 			if(task.duration==None):
 				print ("error you entered a task with no duration") 
 				return False
+			if(task.duration<=0):
+				print ("error duration must be greater than 0") 
+				return False								
+
 			if(task.lowerbound<0 or task.lowerbound>=2400 ):
 				print ('error your lowerbound must lie from 0 to not higher than 2400') 
 				return False
@@ -73,8 +86,10 @@ class AddTask():
 
 			AllocationSpace.AllocateTime(task)
 
+		AllocationSpace.GetData()
 		for i in AllocationSpace.priorityQueue:
-			if(AllocationSpace.AllocateTime(i[1])):
+			if(AllocationSpace.AllocateTime(i[1])==True):
+				print ("true")
 				AllocationSpace.priorityQueue.pop()
 
 class Menu():
