@@ -57,6 +57,13 @@ Atributes:None
 Methods involve is addTask
 '''
 class AddTask():
+	'''	method  __init__
+		created January 29,2017
+
+		This method initializes an object of class AddTask.
+		__init__ methods return None.
+		This method has no parameters
+	'''
 	def __init__(self):
 		pass
 
@@ -162,6 +169,13 @@ Primary attributes is Allocator which an instance of AddTask class.
 Methods is ActiveState
 '''
 class Menu():
+	'''	method  __init__
+		created January 29,2017
+
+		This method initializes an object of class Menu.
+		__init__ methods return None.
+		This method has no parameters.
+	'''
 	def __init__(self):
 		self.Allocator=AddTask() #this is an initialized addTask class
 
