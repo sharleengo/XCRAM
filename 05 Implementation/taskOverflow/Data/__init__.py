@@ -50,6 +50,13 @@ class Task is a superclass. This describes the primary structure of a task.
 Attrubutes involve title and duration.
 '''
 class Task():
+	'''	method  __init__
+		created January 29,2017
+
+		This method initializes an object of class Task.
+		__init__ methods return None.
+		This method have paramaters title and duration of types string and int respectively.
+	'''
 	def __init__(self, title,duration):
 		self.title=title #this variable describes the title of title task
 		self.duration=duration 	#this variable describes the duration of the task
@@ -60,6 +67,13 @@ class FixTask is a subclass of Task. FixTask is a task that cannot be moved.
 Attributes involve title,duration,mustart and mustend
 '''
 class FixTask(Task):
+	'''	method  __init__
+		created January 29,2017
+
+		This method initializes an object of class FixTask.
+		__init__ methods return None.
+		This method have paramaters title,duration,muststart,mustend of types string and ints respectively.
+	'''
 	def __init__(self,title,duration,mustart,mustend):
 		Task.__init__(self,title,duration) 	
 		self.mustart=mustart 	#this variable indicates where the FixTask must start
@@ -72,6 +86,13 @@ Class FlexibleTask is a subclass of Task. FlexibleTask is a task that can be del
 Attributes involve title,priority,duration,lowerbound,and upperbound
 '''
 class FlexibleTask(Task):
+	'''	method  __init__
+		created January 29,2017
+
+		This method initializes an object of class FlexibleTask.
+		__init__ methods return None.
+		This method have paramaters title,duration,priority,lowerbound,upperbound of types string and ints respectively.
+	'''
 	def __init__(self,title,duration,priority,lowerbound,upperbound):
 		Task.__init__(self,title,duration)
 		self.priority=priority 	#this variable indicates the priority of a flexible Task, lower value means higher priority
@@ -85,6 +106,14 @@ Attributes involve startTime,endTime,span and status.
 Methods are isFree and isEnoudh
 '''
 class TimeBlock():
+	'''	method  __init__
+		created January 29,2017
+
+		This method initializes an object of class TimeBlock.
+		__init__ methods return None.
+		This method have paramaters startTime,endTime,span,status of types ints for the first three parameters 
+		and Task type for the last parameter.
+	'''
 	def __init__(self,startTime,endTime,span,status):
 		self.startTime=startTime #this variable describes TimeBlock's initial time
 		self.endTime=endTime #this variable describes TimeBlock's end time
@@ -132,6 +161,13 @@ AllocateMaxTime,LocateKick,LocateKickFix,Kick and Merge
 '''
 class AllocationSpace():
 
+	'''	method  __init__
+		created January 29,2017
+
+		This method initializes an object of class AllocationSpace.
+		__init__ methods return None.
+		This method have paramaters string name.
+	'''
 	def __init__(self,name):
 		'''this constructor initializes the class and sets the name; new space is created and initialized priorityQueue to be empty'''
 		self.name=name #this variable describes the name of the AllocationSpace.
