@@ -50,6 +50,7 @@ module from python like heapq and random had been imported.
 Python module, and system model was also imported
 '''
 
+
 '''
 class Task is a superclass. This describes the primary structure of a task.
 Attrubutes involve title and duration.
@@ -265,8 +266,6 @@ class AllocationSpace():
 
 
 
-		for i in oldSpace:
-			print (i.status)
 
 		#Allocate tasks.
 		while(timeRemaining>0):
@@ -297,7 +296,9 @@ class AllocationSpace():
 				startTB=self.SearchStartingTimeBlock(tflex)
 
 
-				if( startTB==None):
+
+				'''if( startTB==None):
+					if(timeRemaining<=0)
 					self.space=oldSpace
 					self.Merge()
 					startTB=None
@@ -306,16 +307,18 @@ class AllocationSpace():
 					#self.GetData()
 					print ("task is not allocated")
 					return False
-				elif( startTB.startTime==oldstartTb.startTime):
-					print (startTB.startTime)
-					self.space=oldSpace
-					self.Merge()
-					startTB=None
+				'''
+				if (startTB!=None):
+					if( startTB.startTime==oldstartTb.startTime):
+						print (startTB.startTime)
+						self.space=oldSpace
+						self.Merge()
+						startTB=None
 
-					self.Merge()
-					#self.GetData()
-					print ("task is not allocated")
-					return False					
+						self.Merge()
+						#self.GetData()
+						print ("task is not allocated")
+						return False					
 
 			startTB=self.SearchStartingTimeBlock(tflex)
 
@@ -401,6 +404,7 @@ class AllocationSpace():
 			for i in self.space:
 				print (i.startTime)
 				if(i.isFree() and i.startTime>=tflex.lowerbound and i.startTime<tflex.upperbound and i.span>=tflex.duration and tflex.upperbound-i.startTime>=tflex.duration):
+					print ("hello")
 					#self.GetData()
 					return i				
 				if (i.isFree() and  i.startTime>=tflex.lowerbound and i.startTime<=tflex.upperbound):
@@ -600,10 +604,14 @@ class AllocationSpace():
 			return timeRemaining
 
 		while(pointer<len(self.space)):
+			print ("POINTER",self.space[pointer].startTime,self.space[pointer].endTime)
+			print ("timeRemaining",timeRemaining)
 			if(timeRemaining<=0):
 				'''check kung meron pa'''
+				print ("task allocation is a success")
+				return timeRemaining
 
-				break
+
 
 			if(self.space[pointer].startTime<tflex.lowerbound and self.space[pointer].endTime>tflex.upperbound):
 				'''check kung pasok sa range'''
@@ -611,15 +619,26 @@ class AllocationSpace():
 				break
 			if(self.space[pointer].isFree() and self.space[pointer].span>timeRemaining):
 				'''split into two blocks'''
-				newTB=TimeBlock(self.space[pointer].startTime+timeRemaining,self.space[pointer].endTime,self.space[pointer].span-timeRemaining,None)
-				self.space[pointer].endTime=newTB.startTime
-				self.space[pointer].span=self.space[pointer].endTime-self.space[pointer].startTime
-				self.space.insert(pointer+1,newTB)
-				self.GetData()
+				if(self.space[pointer].startTime==tflex.lowerbound):
+					print ("split")
+					newTB=TimeBlock(self.space[pointer].startTime+timeRemaining,self.space[pointer].endTime,self.space[pointer].span-timeRemaining,None)
+					self.space[pointer].endTime=newTB.startTime
+					self.space[pointer].span=self.space[pointer].endTime-self.space[pointer].startTime
+					self.space.insert(pointer+1,newTB)
+				if(self.space[pointer].startTime<tflex.lowerbound):
+					print ("split")
+					newTB=TimeBlock(tflex.lowerbound,self.space[pointer].endTime,self.space[pointer].endTime-tflex.lowerbound,None)
+					self.space[pointer].endTime=newTB.startTime
+					self.space[pointer].span=self.space[pointer].endTime-self.space[pointer].startTime
+					self.space.insert(pointer+1,newTB)					
+				#self.GetData()
+
 
 			if (self.space[pointer].isFree() and self.space[pointer].startTime>=tflex.lowerbound and self.space[pointer].endTime<=tflex.upperbound):
+				print ("im here")
 				self.space[pointer].status=tflex
 				timeRemaining-=self.space[pointer].span
+				self.GetData()
 			pointer+=1
 		#print ("after allocation")
 		#self.GetData()
@@ -683,7 +702,7 @@ class AllocationSpace():
 
 	'''
 	
-		def LocateKickFix(self,tfix):
+	def LocateKickFix(self,tfix):
 		tokick=[]
 		pointer=None
 		for i in range(0,len(self.space)):
