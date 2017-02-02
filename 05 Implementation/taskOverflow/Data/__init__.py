@@ -44,6 +44,11 @@ from __future__ import print_function
 import heapq
 import random
 
+'''
+For all Classes, no files or database tables had been used.
+module from python like heapq and random had been imported.
+Python module, and system model was also imported
+'''
 
 '''
 class Task is a superclass. This describes the primary structure of a task.
