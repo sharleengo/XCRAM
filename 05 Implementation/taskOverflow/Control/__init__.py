@@ -11,6 +11,16 @@ import UI.__init__ as UI
 class AddTask():
 	def __init__(self):
 		pass
+
+	'''method addTask
+		created January 29,2017	
+
+		This method is responsible for checking the parameters for a specific Task.
+		It checks if each attributes of the task is valid. And this methods decide if 
+		the task entered is valid.
+		The method returns False if it does not passed the necessary condition for Allocation.
+		Formal parameters of this method is task and AllocationSpace of type Task and AllocationSpace respectively.
+	'''
 	def addTask(self,task,AllocationSpace):
 		'''check parameters of task'''
 
@@ -52,7 +62,7 @@ class AddTask():
 			AllocationSpace.AllocateTimeFix(task)	
 	
 		elif isinstance(task,Dat.FlexibleTask):
-			if(task.lowerbound%100 > 59 or task.upperbound%100>59 or task.duration%59>100):
+			if(task.lowerbound%100 > 100 or task.upperbound%100>100 or task.duration%100>100):
 				print ("invalid time input")				
 
 			task.duration=task.duration-(task.duration%100)+((task.duration%100)*(100.0/60))
@@ -96,6 +106,15 @@ class Menu():
 	def __init__(self):
 		self.Allocator=AddTask()
 
+
+	'''method ActiveState
+		created January 29,2017	
+
+		This method is the does the interface between the use and the software itself.
+		It provides prompt which the user have to respond to inorder to perform the Allocation.
+		The method does not return anything.
+		Formal parameters of this method is AllocationSpace of type AllocationSpace.
+	'''	
 	def ActiveState(self,AllocationSpace):
 		while(True):
 			#os.system('cls')
@@ -119,10 +138,3 @@ class Menu():
 
 					newT=Dat.FlexibleTask(title,duration,priority,lowerbound,upperbound)
 					newT=self.Allocator.addTask(newT,AllocationSpace)
-
-
-
-
-
-
-
