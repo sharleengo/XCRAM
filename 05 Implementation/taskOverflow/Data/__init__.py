@@ -181,12 +181,14 @@ class AllocationSpace():
 		#saving current data...
 		oldSpace=[] #this cariable is a list the saves the current space in case the Allocation fails and needs to be undone.
 		print (self.space)
+
 		for i in self.space:
 			j=TimeBlock(i.startTime,i.endTime,i.span,i.status)
 			oldSpace.append(j)
 		if(self.space==oldSpace):
 			print ("magkapareho")
 
+		temp=oldSpace
 		#search for possible TimeBlocks.
 		startTB=self.SearchStartingTimeBlock(tflex) #this variable keeps track of the current TimeBlock while traversing the Allocation Space
 
@@ -276,7 +278,6 @@ class AllocationSpace():
 
 			startTB=self.SearchStartingTimeBlock(tflex)
 
-
 		print ("Task Allocated is a success")
 
 		self.Merge()
@@ -308,6 +309,10 @@ class AllocationSpace():
 			TBtokick=self.LocateKickFix(tfix)
 			tasktokick=[] #this variable provides list for the TimeBLocks that needs to be freed and this variable is returned by this method
 			totalspan=0  #this keeps tracks of the current free space generated while Kick method is happening
+
+			if(TBtokick==None):
+				print ("Unsuccessful Allocation")
+				return False
 
 			for i in TBtokick:
 				totalspan+=i.span
@@ -614,18 +619,11 @@ class AllocationSpace():
 		The method returns a list of TimeBlocks.
 		Formal parameter is tfix of type FixTask.
 	'''
-	def LocateKickFix(self,tfix):
+	'''def LocateKickFix(self,tfix):
 		tokick=[] #this variable is a list of tasks to be kicked.
 		for i in self.space:
 			if (isinstance(i.status,FlexibleTask)):
-				'''if(i.startTime<= tfix.mustart and i.endTime>tfix.mustend):
-					tokick.append(i)
-				elif(i.startTime<tfix.mustart and i.endTime>=tfix.mustend):
-					tokick.append(i)
-				elif(i.startTime>tfix.mustart and i.endTime<tfix.mustend):
-					tokick.append(i)
-				elif(i.startTime==tfix.mustart and i.endTime==tfix.mustend):
-					tokick.append(i)'''
+
 
 				if(i.startTime >= tfix.mustart and i.startTime<tfix.mustend):
 
@@ -638,6 +636,23 @@ class AllocationSpace():
 			print (i.startTime)
 		return tokick
 
+	'''
+	
+	def LocateKickFix(self,tfix):
+		tokick=[]
+		pointer=None
+		for i in range(0,len(self.space)):
+			if (tfix.mustart>=self.space[i].startTime and self.space[i].endTime>tfix.mustart):
+				pointer=i
+				break
+		while(self.space[pointer].startTime<tfix.mustend):
+			if(isinstance(self.space[pointer].status,FlexibleTask)):
+				tokick.append(self.space[pointer])
+			elif(isinstance(self.space[pointer].status,FixTask)):
+				return None
+			pointer+=1
+
+		return tokick
 
 
 	'''method Kick
@@ -703,8 +718,15 @@ class AllocationSpace():
 
 
 if __name__=="__main__":
-	#myAS=AllocationSpace("")
+	myAS=AllocationSpace("")
 	#myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
 	#myAS.AllocateTime(FlexibleTask("A",300,1,400,700))	
-	#myAS.AllocateTime(FlexibleTask("B",100,1,1000,1100))		
+	#myAS.AllocateTimeFix(FixTask("B",100,700,800))
+	#myAS.AllocateTimeFix(FixTask("C",200,600,800))	
+	#for i in myAS.priorityQueue:
+	#	if(myAS.AllocateTime(i[1])==True):
+	#		print ("true")
+	#		myAS.priorityQueue.pop()
+	#myAS.GetData()	
+	#myAS.AllocateTime(FlexibleTask("B",100,1,1000,1100))		##
 	pass
