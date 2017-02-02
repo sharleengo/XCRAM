@@ -403,11 +403,11 @@ class AllocationSpace():
 				if(i.isFree() and i.startTime>=tflex.lowerbound and i.startTime<tflex.upperbound and i.span>=tflex.duration and tflex.upperbound-i.startTime>=tflex.duration):
 					#self.GetData()
 					return i				
-				if (i.isFree() and  i.startTime>=tflex.lowerbound and i.startTime<=i.endTime):
+				if (i.isFree() and  i.startTime>=tflex.lowerbound and i.startTime<=tflex.upperbound):
 					return i
-				if (i.isFree() and  i.startTime>=tflex.lowerbound and i.startTime<i.endTime):
+				if (i.isFree() and  i.startTime>=tflex.lowerbound and i.startTime<tflex.upperbound):
 					return i					
-				if (i.isFree() and  i.endTime>tflex.lowerbound and i.startTime<=i.endTime):
+				if (i.isFree() and  i.endTime>tflex.lowerbound and i.startTime<=tflex.upperbound):
 					return i										
 
 			for i in self.space:
