@@ -108,7 +108,7 @@ class TimeBlock():
 
 
 	'''	
-		method  isFree
+		method  isEnough
 		created January 29,2017
 
 		This method is a method of the TimeBlock class.
@@ -523,7 +523,7 @@ class AllocationSpace():
 		return self.space[index]
 
 
-	'''method spltAndReturnRight
+	'''method splitAndReturnRight
 		created January 29,2017	
 
 		This method splits a specified TimeBlock into two sub TimeBlocks.
@@ -544,8 +544,12 @@ class AllocationSpace():
 
 	
 
-	'''
+	'''method AllocateMaxTime
+		created January 29,2017	
 
+		This method iteratively allocates the task in a free TimeBlock.
+		This method return the remaining time at the end of the allocations.
+		Formal parameters are counter,tflex and timeRemaining of type integer,FlexibleTask and integer.
 	'''
 	def AllocateMaxTime(self,counter,tflex,timeRemaining):
 
@@ -638,7 +642,7 @@ class AllocationSpace():
 
 	'''
 	
-	def LocateKickFix(self,tfix):
+		def LocateKickFix(self,tfix):
 		tokick=[]
 		pointer=None
 		for i in range(0,len(self.space)):
@@ -720,13 +724,13 @@ class AllocationSpace():
 if __name__=="__main__":
 	myAS=AllocationSpace("")
 	#myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
-	#myAS.AllocateTime(FlexibleTask("A",300,1,400,700))	
-	#myAS.AllocateTimeFix(FixTask("B",100,700,800))
-	#myAS.AllocateTimeFix(FixTask("C",200,600,800))	
-	#for i in myAS.priorityQueue:
-	#	if(myAS.AllocateTime(i[1])==True):
-	#		print ("true")
-	#		myAS.priorityQueue.pop()
-	#myAS.GetData()	
+	myAS.AllocateTime(FlexibleTask("A",300,1,400,700))	
+	myAS.AllocateTimeFix(FixTask("B",100,700,800))
+	myAS.AllocateTimeFix(FixTask("C",200,600,800))	
+	for i in myAS.priorityQueue:
+		if(myAS.AllocateTime(i[1])==True):
+			print ("true")
+			myAS.priorityQueue.pop()
+	myAS.GetData()	
 	#myAS.AllocateTime(FlexibleTask("B",100,1,1000,1100))		##
-	pass
+	#pass
