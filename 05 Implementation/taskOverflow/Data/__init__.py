@@ -116,7 +116,7 @@ class AllocationSpace():
 
 
 	'''	
-		method  isFree
+		method  getData
 		created January 29,2017
 
 		This method is a method of the AllocationSpace class.
@@ -442,7 +442,14 @@ class AllocationSpace():
 			return False
 
 
+	'''method spltAndReturnMiddle
+		created January 29,2017	
 
+		This method splits a specified TimeBlock into three sub TimeBlocks.
+		This is usually called when the method inTheMiddle returns True.
+		The middle sublock is then returned.
+		Formal parameters are startTB and tflex of type TimeBlock and Task respectively.
+	'''
 	def splitAndReturnMiddle(self,startTB,tflex):
 		index=self.space.index(startTB)
 		
@@ -464,6 +471,15 @@ class AllocationSpace():
 
 		return self.space[index+1]
 	
+
+	'''method spltAndReturnLeft
+		created January 29,2017	
+
+		This method splits a specified TimeBlock into two sub TimeBlocks.
+		This is usually called when the method leftSided returns True.
+		The left sublock is then returned.
+		Formal parameters are startTB and tflex of type TimeBlock and Task respectively.
+	'''
 	def splitAndReturnLeft(self,startTB,tflex):
 		index=self.space.index(startTB)
 
@@ -474,6 +490,16 @@ class AllocationSpace():
 		self.space.insert(index+1,newTB1)
 
 		return self.space[index]
+
+
+	'''method spltAndReturnRight
+		created January 29,2017	
+
+		This method splits a specified TimeBlock into two sub TimeBlocks.
+		This is usually called when the method rightSided returns True.
+		The right sublock is then returned.
+		Formal parameters are startTB and tflex of type TimeBlock and Task respectively.
+	'''
 	def splitAndReturnRight(self,startTB,tflex):
 		index=self.space.index(startTB)
 
@@ -485,7 +511,11 @@ class AllocationSpace():
 
 		return self.space[index+1]
 
+	
 
+	'''
+
+	'''
 	def AllocateMaxTime(self,counter,tflex,timeRemaining):
 
 		pointer=counter
@@ -520,6 +550,17 @@ class AllocationSpace():
 		return timeRemaining
 
 
+
+	'''method LocateKick
+		created January 29,2017	
+
+		This method is responsible for searching for TimeBlock with a flexibleTas status 
+		given that there is no possible free TimeBlock for such task.
+		The method returns a TimeBlock of the lowest priority within the task's bounds 
+		but returns None once it does not find any TimeBlock that is a candidate to be kicked.
+		Formal parameters are counter an integer, which describes the index of the current startTB
+		and tflex of type FlexibleTask.
+	'''
 	def LocateKick(self,counter,tflex):
 		if(counter<0):
 			pointer=0
@@ -537,6 +578,16 @@ class AllocationSpace():
 			return None
 
 
+
+	'''method LocateKickFix
+		created January 29,2017	
+
+		This method is a counter part of LocateKick but in this case, a fixTask must be allocated.
+		This method searches for the list of TimeBlocks that needs to be kicked
+		in order for the fixTask to be allocated.
+		The method returns a list of TimeBlocks.
+		Formal parameter is tfix of type FixTask.
+	'''
 	def LocateKickFix(self,tfix):
 		tokick=[]
 		for i in self.space:
@@ -562,6 +613,15 @@ class AllocationSpace():
 		return tokick
 
 
+
+	'''method Kick
+		created January 29,2017	
+
+		This method is responsible for kicking tasks in a TimeBlock. 
+		Information about this task is then push to a heap that is needed for resheduling.
+		The method does not return anything.
+		Formal parameter is tobekicked of type FlexibleTask.
+	'''
 	def Kick(self,tobekicked):
 		heapq.heappush(self.priorityQueue,(tobekicked.priority,tobekicked))
 		for i in self.space:
@@ -573,6 +633,17 @@ class AllocationSpace():
 	def AllocateRemainingTime(self,counter,tflex,remainingTime):
 		pass
 
+	
+
+	'''method Merge
+		created January 29,2017	
+
+		This method is responsible for merging consecutive free TimeBlocks and 
+		merging consecutive blocks with the same status.
+		Merging is necessary because the Allocation Algorithm involves partitioning and spliting of TimeBLocks. 
+		The method does not return anything.
+		This method doent have any parameters.
+	'''
 	def Merge(self):
 		#def __init__(self,title,duration,mustart,mustend):
 	#	def __init__(self,startTime,endTime,span,status):		
