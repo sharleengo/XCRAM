@@ -17,7 +17,7 @@ class AddTask():
 
 		This method is responsible for checking the parameters for a specific Task.
 		It checks if each attributes of the task is valid. And this methods decide if 
-		the task entered is valid.
+		it continues for allocation.
 		The method returns False if it does not passed the necessary condition for Allocation.
 		Formal parameters of this method is task and AllocationSpace of type Task and AllocationSpace respectively.
 	'''
