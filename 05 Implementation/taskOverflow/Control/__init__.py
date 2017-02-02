@@ -46,6 +46,12 @@ import math
 import Data.__init__ as Dat
 import UI.__init__ as UI
 
+'''
+For all Classes, no files or database tables had been used.
+module from Data.__init__ and UI__init__ had been impoted.
+Python module, and system model was also imported
+'''
+
 '''This class is a ControlClass for Adding Task.
 Atributes:None
 Methods involve is addTask
@@ -61,7 +67,8 @@ class AddTask():
 		It checks if each attributes of the task is valid. And this methods decide if 
 		the task entered is valid.
 		The method returns False if it does not passed the necessary condition for Allocation.
-		Formal parameters of this method is task and AllocationSpace of type Task and AllocationSpace respectively.
+		Formal parameters of this method is task and AllocationSpace of type Task and AllocationSpace respectively
+		AllocationSpace is an instance off the class Allocation in which we will allocate task.
 	'''
 	def addTask(self,task,AllocationSpace):
 		'''check parameters of task'''
@@ -77,7 +84,7 @@ class AddTask():
 			task.mustend=task.mustend-(task.mustend%100)+((task.mustend%100)*(100.0/60))
 
 			print task.duration,task.mustart,task.mustend			
-			if(task.title==None):
+			if(task.title==""):
 				print ("error you entered a task with no title") 
 				return False
 			if(task.duration==None):
@@ -112,7 +119,7 @@ class AddTask():
 			task.upperbound=task.upperbound-(task.upperbound%100)+(task.upperbound%100)*(100.0/60)
 
 
-			if(task.title==None):
+			if(task.title==""):
 				print ("error you entered a task with no title")
 				return False
 			if(task.duration==None):
@@ -121,6 +128,10 @@ class AddTask():
 			if(task.duration<=0):
 				print ("error duration must be greater than 0") 
 				return False								
+
+			if(task.priority==None):
+				print ("error user must enter priority") 
+				return False												
 
 			if(task.lowerbound<0 or task.lowerbound>=2400 ):
 				print ('error your lowerbound must lie from 0 to not higher than 2400') 
@@ -172,17 +183,31 @@ class Menu():
 			if(event=="A"):
 				newT=None #this is a temporary variablee for the possible task to be created
 				title=raw_input("enter task title\n") #this variable takes note of the entered title
-				duration=input("enter duration\n") #this variable takes note of the entered duration
-				ttype=input("enter task type\n[1].Fix Task \t[2].Flexible Task\n")
-				if(ttype==1):
-					mustart=input("enter start time\n") #this variable takes note of the entered mustart
-					mustend=input("enter end time\n") #this variable takes note of the entered mustend
-					newT=Dat.FixTask(title,duration,mustart,mustend)
-					newT=self.Allocator.addTask(newT,AllocationSpace)
-				elif(ttype==2):
-					priority=input("enter priority") #this variable takes note of the entered priority
-					lowerbound=input("inter lowerbound\n") #this variable takes note of the entered lowerbound
-					upperbound=input("inter upperbound\n") #this variable takes note of the entered upperbound
+				ttype=0
+				try:
 
-					newT=Dat.FlexibleTask(title,duration,priority,lowerbound,upperbound)
-					newT=self.Allocator.addTask(newT,AllocationSpace)
+					duration=int(raw_input("enter duration\n")) #this variable takes note of the entered duration
+					ttype=int(raw_input("enter task type\n[1].Fix Task \t[2].Flexible Task\n"))			
+				except ValueError as V:
+					print (V)
+				if(ttype==1):
+					try:
+						mustart=int(raw_input("enter start time\n")) #this variable takes note of the entered mustart
+						mustend=int(raw_input("enter end time\n")) #this variable takes note of the entered mustend
+					except ValueError as V:
+					    print(V)
+					else:
+						newT=Dat.FixTask(title,duration,mustart,mustend)
+						newT=self.Allocator.addTask(newT,AllocationSpace)
+
+
+				elif(ttype==2):
+					try:
+						priority=int(raw_input("enter priority")) #this variable takes note of the entered priority
+						lowerbound=int(raw_input("inter lowerbound\n")) #this variable takes note of the entered lowerbound
+						upperbound=int(raw_input("inter upperbound\n")) #this variable takes note of the entered upperbound
+					except ValueError as V:
+					    print(V)
+					else:
+						newT=Dat.FlexibleTask(title,duration,priority,lowerbound,upperbound)
+						newT=self.Allocator.addTask(newT,AllocationSpace)
