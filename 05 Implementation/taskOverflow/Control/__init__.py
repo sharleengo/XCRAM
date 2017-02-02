@@ -1,3 +1,44 @@
+'''
+MIT License
+
+Copyright (c) 2017 Gerry P. Agluba Jr.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+This is a course requirement for CS192 Software Engineering II
+under the supervision of Asst. Prof. Ma.Rowena C. Solamo 
+of the Department of Computer Science, College of Engineering,
+University of the Philippines, Diliman for the AY 2016-2017
+
+Gerry Agluba Jr.
+last updated on January 31,2017
+Initial Software for Control Classes , its structures and methods.
+
+File created on January 29,2017.
+Developed by TaskOverflow group.
+
+This software serves as the primary Control Classes  of our 
+Software Project (Task OverFlow).
+
+'''
+
 import sys
 import os
 import math 
@@ -5,9 +46,10 @@ import math
 import Data.__init__ as Dat
 import UI.__init__ as UI
 
-
-
-
+'''This class is a ControlClass for Adding Task.
+Atributes:None
+Methods involve is addTask
+'''
 class AddTask():
 	def __init__(self):
 		pass
@@ -17,7 +59,7 @@ class AddTask():
 
 		This method is responsible for checking the parameters for a specific Task.
 		It checks if each attributes of the task is valid. And this methods decide if 
-		it continues for allocation.
+		the task entered is valid.
 		The method returns False if it does not passed the necessary condition for Allocation.
 		Formal parameters of this method is task and AllocationSpace of type Task and AllocationSpace respectively.
 	'''
@@ -59,7 +101,7 @@ class AddTask():
 
 
 
-			AllocationSpace.AllocateTimeFix(task)	
+			AllocationSpace.AllocateTimeFix(task)	#a method call to AllocateTimeFix
 	
 		elif isinstance(task,Dat.FlexibleTask):
 			if(task.lowerbound%100 > 100 or task.upperbound%100>100 or task.duration%100>100):
@@ -94,17 +136,23 @@ class AddTask():
 				return False
 
 
-			AllocationSpace.AllocateTime(task)
+			AllocationSpace.AllocateTime(task)#a method call to AllocateTimeFix
 
-		AllocationSpace.GetData()
+		AllocationSpace.GetData() 
+		#the code below performs the rescheduling of recently kicked tasks
 		for i in AllocationSpace.priorityQueue:
 			if(AllocationSpace.AllocateTime(i[1])==True):
 				print ("true")
 				AllocationSpace.priorityQueue.pop()
 
+
+'''This class is a ControlClass for prompting user inputs.
+Primary attributes is Allocator which an instance of AddTask class.
+Methods is ActiveState
+'''
 class Menu():
 	def __init__(self):
-		self.Allocator=AddTask()
+		self.Allocator=AddTask() #this is an initialized addTask class
 
 
 	'''method ActiveState
@@ -120,21 +168,21 @@ class Menu():
 			#os.system('cls')
 			AllocationSpace.GetData()		
 			print ("[A].Add task\n")
-			event=raw_input("")
+			event=raw_input("") #this keeps tracks of the actions specified the user
 			if(event=="A"):
-				newT=None
-				title=raw_input("enter task title\n")
-				duration=input("enter duration\n")
+				newT=None #this is a temporary variablee for the possible task to be created
+				title=raw_input("enter task title\n") #this variable takes note of the entered title
+				duration=input("enter duration\n") #this variable takes note of the entered duration
 				ttype=input("enter task type\n[1].Fix Task \t[2].Flexible Task\n")
 				if(ttype==1):
-					mustart=input("enter start time\n")
-					mustend=input("enter end time\n")
+					mustart=input("enter start time\n") #this variable takes note of the entered mustart
+					mustend=input("enter end time\n") #this variable takes note of the entered mustend
 					newT=Dat.FixTask(title,duration,mustart,mustend)
 					newT=self.Allocator.addTask(newT,AllocationSpace)
 				elif(ttype==2):
-					priority=input("enter priority")
-					lowerbound=input("inter lowerbound\n")
-					upperbound=input("inter upperbound\n")
+					priority=input("enter priority") #this variable takes note of the entered priority
+					lowerbound=input("inter lowerbound\n") #this variable takes note of the entered lowerbound
+					upperbound=input("inter upperbound\n") #this variable takes note of the entered upperbound
 
 					newT=Dat.FlexibleTask(title,duration,priority,lowerbound,upperbound)
 					newT=self.Allocator.addTask(newT,AllocationSpace)
