@@ -46,6 +46,13 @@ import UI.__init__ as UI
 
 import pygame
 
+
+'''
+For all Classes, no files or database tables had been used.
+module from Data.__init__ ,Control.__init__ and UI__init__ had been impoted.
+Python module, and system model was also imported
+'''
+
 '''
 This class integrates an instance of AllocationSpace in Data Classes
 and Menu in Control classes.
@@ -54,6 +61,13 @@ Attribues are myAllocationSpace, and Allocator
 '''
 
 class main():
+	'''	method  __init__
+		created January 29,2017
+
+		This method initializes an object of class main.
+		__init__ methods return None.
+		This method has no parameters
+	'''	
 	def __init__(self):
 		self.myAllocationSpace=Dat.AllocationSpace("myTasks") #intializes an instance of AllocationSpace
 		
