@@ -217,213 +217,118 @@ class AllocationSpace():
 		It returns a boolean value True if the allocation is successful, otherwise False.
 		The formal parameter tflex is of type FlexibleTask.
 	'''
-	def AllocateTime(self,tflex):
-		print ("allocating",tflex.title,tflex.duration,tflex.lowerbound,tflex.upperbound)
+	def AllocateTime(self,task,Partition=False):
+		print ("allocating",task.title)
 
 		#saving current data...
 		oldSpace=[] #this cariable is a list the saves the current space in case the Allocation fails and needs to be undone.
-		print (self.space)
+		#print (self.space)
 
 		for i in self.space:
 			j=TimeBlock(i.startTime,i.endTime,i.span,i.status)
 			oldSpace.append(j)
-		if(self.space==oldSpace):
-			print ("magkapareho")
 
-		temp=oldSpace
-		#search for possible TimeBlocks.
-		startTB=self.SearchStartingTimeBlock(tflex) #this variable keeps track of the current TimeBlock while traversing the Allocation Space
 
-		#search for timeblock that has lower priority.
-		if(startTB==None):
-			startTB=self.SearchStartingFlexibleTaskTimeBlock(tflex)
-			if startTB==None:
-				print ("task cannot be allocated")
-				self.space=oldSpace
-				return False
-
-		#if startTB is not free, then locate for possible kicks.
-		if(not startTB.isFree()):
-			tasktokick=self.LocateKick(self.space.index(startTB),tflex) #this variable is a TimeBlocks that needs to be freed/tasks that needs to be kicked
-			if(tasktokick==None):
-				self.space=oldSpace				
-				print ("task cannot be allocated")
-				return False
-			else:
-				self.Kick(tasktokick)
+		if(isinstance(task,FixTask)):
+			TB=self.SearchFreeTimeBlockFix(task)
+			if TB!=None:
+				print (TB.startTime)
+				TB.status=task
 				self.Merge()
-				startTB=self.SearchStartingTimeBlock(tflex)	
-
-		#if TimeBLock is enough, do possible splitting
-		if(startTB.isEnough(tflex)):
-			if(self.inTheMiddle(startTB,tflex)):
-				startTB=self.splitAndReturnMiddle(startTB,tflex)
-			elif(self.leftSided(startTB,tflex)):
-				startTB=self.splitAndReturnLeft(startTB,tflex)
-			elif(self.rightSided(startTB,tflex)):
-				startTB=self.splitAndReturnRight(startTB,tflex)			
-		timeRemaining=tflex.duration #this variable keeps tracks of the remainingTime while doeing the Allocation
-
-
-
-
-		#Allocate tasks.
-		while(timeRemaining>0):
-			print ("timeRemaining",timeRemaining)
-			if(startTB==None):				
-				startTB=self.SearchStartingFlexibleTaskTimeBlock(tflex)
-				if(startTB==None):
-					for i in oldSpace:
-						print (i.status)
-					self.space=oldSpace
-					print ("cannot Allocate")
+				print ("Allocation Successful.")
+				return True
+			else:
+				tobekicked=self.LocateKickFix(task)
+				if len(tobekicked)==0:
+					print ("Allocation UnSuccessful.")
 					return False
 				else:
-					tasktokick=self.LocateKick(self.space.index(startTB),tflex)
-					if(tasktokick==None):
-						self.space=oldSpace		
-						print ("unable to allocate space for the given task")
-						return False
-					else:
-						self.Kick(tasktokick)
-						self.Merge()
-						
+					for i in tobekicked:
+						self.Kick(i)
 
-			else:
-				timeRemaining=self.AllocateMaxTime(self.space.index(startTB),tflex,timeRemaining)
+					self.Merge()
+					TB=self.SearchFreeTimeBlockFix(task)
+					print ("haha",TB.startTime)		
+					TB.status=task
+					print ("Allocation Successful.")
+					return True				
+
+		elif (isinstance(task,FlexibleTask)):
+			TB=self.SearchFreeTimeBlockFlex(task)
+			if TB!=None:
+
+				TB.status=task
 				self.Merge()
-				oldstartTb=startTB
-				startTB=self.SearchStartingTimeBlock(tflex)
-
-
-
-				'''if( startTB==None):
-					if(timeRemaining<=0)
-					self.space=oldSpace
-					self.Merge()
-					startTB=None
-
-					self.Merge()
-					#self.GetData()
-					print ("task is not allocated")
-					return False
-				'''
-				if (startTB!=None):
-					if( startTB.startTime==oldstartTb.startTime):
-						print (startTB.startTime)
-						self.space=oldSpace
-						self.Merge()
-						startTB=None
-
-						self.Merge()
-						#self.GetData()
-						print ("task is not allocated")
-						return False					
-
-			startTB=self.SearchStartingTimeBlock(tflex)
-
-		print ("Task Allocated is a success")
-
-		self.Merge()
-		return True
-	
-
-	'''method AllocateTimeFix
-		created January 29,2017	
-
-		This method is the core Allocation Algorithm for fix tasks. 
-		It returns a boolean value True if the allocation is successful, otherwise False.
-		The formal parameter tfix is of type FixTask.
-	'''
-	def AllocateTimeFix(self,tfix):
-
-		startTB=self.SearchStartingTimeBlock(tfix)
-		if startTB!=None:
-			if(startTB.isEnough(tfix)):
-				if(self.inTheMiddle(startTB,tfix)):
-					#print ("in the middle")
-					tartTB=self.splitAndReturnMiddle(startTB,tfix)
-				elif(self.leftSided(startTB,tfix)):
-					#print ("left")				
-					startTB=self.splitAndReturnLeft(startTB,tfix)
-				elif(self.rightSided(startTB,tfix)):
-					#print ("right")	
-					startTB=self.splitAndReturnRight(startTB,tfix)			
-		elif startTB==None:
-			TBtokick=self.LocateKickFix(tfix)
-			tasktokick=[] #this variable provides list for the TimeBLocks that needs to be freed and this variable is returned by this method
-			totalspan=0  #this keeps tracks of the current free space generated while Kick method is happening
-
-			if(TBtokick==None):
-				print ("Unsuccessful Allocation")
-				return False
-
-			for i in TBtokick:
-				totalspan+=i.span
-				tasktokick.append(i.status.title)
-			for i in self.space:
-				if i.status!=None:
-					if i.status.title in tasktokick:
-						self.Kick(i.status)
-				if i.status==None:
-					totalspan+=i.span
-			if(totalspan<tfix.duration):
-				print ("not enough space, cannot be allocated")
-				return False
+				print ("Allocation Successful")
+				return True
 			else:
-				for i in self.space:
-					#print ("im heres")
-					if(isinstance(i.status,FlexibleTask)):
-						if i.status.title in tasktokick:
-							self.Kick(i.status)
-			self.Merge()
-			startTB=self.SearchStartingTimeBlock(tfix)
-
-		if(startTB!=None):
-			index=self.space.index(startTB)	
-			self.space[index].status=tfix	
-			self.Merge()
-
-		print ("Allocation Successful.")
-		return True
-		#self.GetData()
+				print (Partition)
+				if Partition==False:
+					self.Merge()
+					print ("Allocation Unsuccessful")
+					return False
+		
+				else:
+					print ("proceeding to partinioning")
+					return self.Partition(task)
 
 
 
-	'''method SearchStartingTimeBlock
-		created January 29,2017	
 
-		This method is responsible in searcheing for possible Free TimeBlock 
-		that is contained in the bounds in case of Flexible tasks,
-		and a Free TimeBlock contained in the mustart and mustend of a fixed task. 
-		It returns a value of type TimeBlock in case the search is successful, otherwise it returns None.
-		The formal parameter  tflex is of type Task.
-	'''
-	def SearchStartingTimeBlock(self,tflex):
-		if isinstance(tflex,FlexibleTask):
-			for i in self.space:
-				print (i.startTime)
-				if(i.isFree() and i.startTime>=tflex.lowerbound and i.startTime<tflex.upperbound and i.span>=tflex.duration and tflex.upperbound-i.startTime>=tflex.duration):
-					print ("hello")
-					#self.GetData()
-					return i				
-				if (i.isFree() and  i.startTime>=tflex.lowerbound and i.startTime<=tflex.upperbound):
-					return i
-				if (i.isFree() and  i.startTime>=tflex.lowerbound and i.startTime<tflex.upperbound):
-					return i					
-				if (i.isFree() and  i.endTime>tflex.lowerbound and i.startTime<=tflex.upperbound):
-					return i										
+	def SearchFreeTimeBlockFix(self,task):
+		'''
+			for all blocks, check if it overlaps wit task's time range. it check if it is enough
+			and performs necesarry splitting.
+		'''
+		for i in self.space:
+			if (i.isFree() and i.startTime<=task.mustart and i.endTime>=task.mustend):
+				if i.isEnough(task):
+					if self.exactlyFitted(i,task):
+						return i
+					elif self.inTheMiddle(i,task):
+						TB=self.splitAndReturnMiddle(i,task)
+						return TB
+					elif self.leftSided(i,task):
+						TB=self.splitAndReturnLeft(i,task)
+						return TB					
+					elif self.rightSided(i,task):
+						TB=self.splitAndReturnRight(i,task)
+						return TB
+		return None
+	
+	def SearchFreeTimeBlockFlex(self,task):
+		'''start with checking if the bounds are in the middle of a Free Block
+		if it is, temporarily split it because we have to cut overlaps for searching precision
+		then split necessary splitting.
+		'''
+		startPointer=0
+		endPointer=1
+		for i in self.space:
+			if i.isFree():
+				if task.lowerbound>i.startTime and task.lowerbound<i.endTime:
+					#split 
+					newTB=TimeBlock(task.lowerbound,i.endTime,i.endTime-task.lowerbound,None)
+					i.endTime=newTB.startTime
+					i.span=i.endTime-i.startTime
+					self.space.insert(self.space.index(i)+1,newTB)
+				if task.upperbound>i.startTime and task.upperbound<i.endTime:
+					#split
+					newTB=TimeBlock(task.upperbound,i.endTime,i.endTime-task.lowerbound,None)
+					i.endTime=newTB.startTime
+					i.span=i.endTime-i.startTime
+					self.space.insert(self.space.index(i)+1,newTB)
 
-			for i in self.space:
-				if(i.isFree() and i.endTime>tflex.lowerbound and i.startTime<tflex.upperbound):
-					return i
-			return None
-		elif isinstance(tflex,FixTask):
-			for i in self.space:
-				if(i.isFree() and i.endTime>=tflex.mustend and i.startTime<=tflex.mustart):
-					return i
-			return None
+		for i in  self.space:
 
+			if i.isFree() and (i.startTime>=task.lowerbound) and (i.startTime<task.upperbound):
+				if i.isEnough(task):
+					#check kung exactlyFitted,lefside
+					if self.exactlyFitted(i,task):
+						return i
+					elif self.leftSided(i,task):
+						TB=self.splitAndReturnLeft(i,task)
+						return TB										
+		return None
 
 	'''method SearchStartingFlexibleTaskTimeBlock
 		created January 29,2017	
@@ -434,13 +339,18 @@ class AllocationSpace():
 		It returns a value of type TimeBlock in case the search is successful, otherwise it returns None.
 		The formal parameter is of tflex is of type FlexibleTask.
 	'''
-	def SearchStartingFlexibleTaskTimeBlock(self,tflex):
-		for i in self.space:
-			if(isinstance(i.status,FlexibleTask) and i.endTime>tflex.lowerbound and i.startTime<tflex.upperbound):
-				if(i.status.priority>tflex.priority):
-					return i
 
-		return None
+	def exactlyFitted(self,TB,t):
+		if isinstance(t,FlexibleTask):
+			if t.duration==TB.span:
+				return True
+			else:
+				return False
+		elif isinstance(t,FixTask):
+			if t.mustart==TB.startTime and t.mustend==TB.endTime:		
+				return True
+			else:
+				return False			
 
 
 	'''method inTheMiddle
@@ -450,15 +360,15 @@ class AllocationSpace():
 		It returns True if such condition is satisfied, Otherwise it returns false.
 		Formal parameters are startTB and tflex of type TimeBlock and Task respectively.
 	'''
-	def inTheMiddle(self,startTB,tflex):
+	def inTheMiddle(self,TB,t):
 
-		if isinstance(tflex,FlexibleTask):
-			if startTB.span>tflex.duration and tflex.lowerbound>startTB.startTime and startTB.endTime>tflex.lowerbound+tflex.duration:		
+		if isinstance(t,FlexibleTask):
+			if t.lowerbound>TB.startTime and t.lowerbound+t.duration<TB.endTime:	
 				return True
 			else:
 				return False
-		elif isinstance(tflex,FixTask):
-			if startTB.span>tflex.duration and startTB.startTime<tflex.mustart and startTB.endTime>tflex.mustend:		
+		elif isinstance(t,FixTask):
+			if t.mustart>TB.startTime and t.mustend<TB.endTime:		
 				return True
 			else:
 				return False			
@@ -471,17 +381,17 @@ class AllocationSpace():
 		It returns True if such condition is satisfied, Otherwise it returns false.
 		Formal parameters are startTB and tflex of type TimeBlock and Task respectively.
 	'''
-	def leftSided(self,startTB,tflex):
-		if isinstance(tflex,FlexibleTask):
-			if startTB.span>tflex.duration and startTB.startTime==tflex.lowerbound and startTB.endTime>tflex.upperbound:		
+	def leftSided(self,TB,t):
+		if isinstance(t,FlexibleTask):
+			if TB.span>t.duration:
 				return True
 			else:
-				return False	
-		elif isinstance(tflex,FixTask):
-			if startTB.span>tflex.duration and startTB.startTime==tflex.mustart and startTB.endTime>tflex.mustend:		
+				return False
+		elif isinstance(t,FixTask):
+			if t.mustart==TB.startTime and t.mustend<TB.endTime:		
 				return True
 			else:
-				return False						
+				return False			
 	
 
 	'''method rightSided
@@ -491,18 +401,17 @@ class AllocationSpace():
 		It returns True if such condition is satisfied, Otherwise it returns false.
 		Formal parameters are startTB and tflex of type TimeBlock and Task respectively.
 	'''
-	def rightSided(self,startTB,tflex):
-		if isinstance(tflex,FlexibleTask):		
-			if startTB.span>tflex.duration and startTB.startTime<tflex.lowerbound and startTB.endTime==tflex.upperbound:		
+	def rightSided(self,TB,t):
+		if isinstance(t,FlexibleTask):
+			if t.lowerbound==TB.startTime and t.lowerbound+t.duration<TB.endTime:	
 				return True
 			else:
 				return False
-		elif isinstance(tflex,FixTask):
-			if startTB.span>tflex.duration and startTB.startTime<tflex.mustart and startTB.endTime==tflex.mustend:		
+		elif isinstance(t,FixTask):
+			if t.mustart>TB.startTime and t.mustend==TB.endTime:		
 				return True
 			else:
-				return False						
-
+				return False			
 	
 	'''method exactlyFitted
 		created January 29,2017	
@@ -511,11 +420,7 @@ class AllocationSpace():
 		It returns True if such condition is satisfied, Otherwise it returns false.
 		Formal parameters are startTB and tflex of type TimeBlock and Task respectively.
 	'''	
-	def exactlyFitted(self,startTB,tflex):
-		if startTB.span==tflex.duration and startTB.startTime==tflex.lowerbound and startTB.endTime==tflex.upperbound:		
-			return True
-		else:
-			return False
+
 
 
 	'''method spltAndReturnMiddle
@@ -577,73 +482,17 @@ class AllocationSpace():
 		Formal parameters are startTB and tflex of type TimeBlock and Task respectively.
 	'''
 	def splitAndReturnRight(self,startTB,tflex):
+		#print ("im here")
 		index=self.space.index(startTB)
 
-		newTB1=TimeBlock(startTB.startTime,startTB.endTime-tflex.duration,startTB.endTime-tflex.duration,None) #this variable is the newly generated timeblock because of the split
+		newTB1=TimeBlock(startTB.startTime,startTB.endTime-tflex.duration,startTB.endTime-tflex.duration-startTB.startTime,None) #this variable is the newly generated timeblock because of the split
 		self.space[index].startTime=startTB.endTime-tflex.duration
 		self.space[index].endTime=startTB.endTime
-		self.space[index].span=startTB.endTime-startTB.endTime+tflex.duration
+		#print (self.space[index].startTime,self.space[index].endTime)
+		self.space[index].span=self.space[index].endTime-self.space[index].startTime
 		self.space.insert(index,newTB1)
 
 		return self.space[index+1]
-
-	
-
-	'''method AllocateMaxTime
-		created January 29,2017	
-
-		This method iteratively allocates the task in a free TimeBlock.
-		This method return the remaining time at the end of the allocations.
-		Formal parameters are counter,tflex and timeRemaining of type integer,FlexibleTask and integer.
-	'''
-	def AllocateMaxTime(self,counter,tflex,timeRemaining):
-
-		pointer=counter
-		timeRemaining=timeRemaining
-		if pointer<0:
-			return timeRemaining
-
-		while(pointer<len(self.space)):
-			print ("POINTER",self.space[pointer].startTime,self.space[pointer].endTime)
-			print ("timeRemaining",timeRemaining)
-			if(timeRemaining<=0):
-				'''check kung meron pa'''
-				print ("task allocation is a success")
-				return timeRemaining
-
-
-
-			if(self.space[pointer].startTime<tflex.lowerbound and self.space[pointer].endTime>tflex.upperbound):
-				'''check kung pasok sa range'''
-
-				break
-			if(self.space[pointer].isFree() and self.space[pointer].span>timeRemaining):
-				'''split into two blocks'''
-				if(self.space[pointer].startTime==tflex.lowerbound):
-					print ("split")
-					newTB=TimeBlock(self.space[pointer].startTime+timeRemaining,self.space[pointer].endTime,self.space[pointer].span-timeRemaining,None)
-					self.space[pointer].endTime=newTB.startTime
-					self.space[pointer].span=self.space[pointer].endTime-self.space[pointer].startTime
-					self.space.insert(pointer+1,newTB)
-				if(self.space[pointer].startTime<tflex.lowerbound):
-					print ("split")
-					newTB=TimeBlock(tflex.lowerbound,self.space[pointer].endTime,self.space[pointer].endTime-tflex.lowerbound,None)
-					self.space[pointer].endTime=newTB.startTime
-					self.space[pointer].span=self.space[pointer].endTime-self.space[pointer].startTime
-					self.space.insert(pointer+1,newTB)					
-				#self.GetData()
-
-
-			if (self.space[pointer].isFree() and self.space[pointer].startTime>=tflex.lowerbound and self.space[pointer].endTime<=tflex.upperbound):
-				print ("im here")
-				self.space[pointer].status=tflex
-				timeRemaining-=self.space[pointer].span
-				self.GetData()
-			pointer+=1
-		#print ("after allocation")
-		#self.GetData()
-		return timeRemaining
-
 
 
 	'''method LocateKick
@@ -656,24 +505,29 @@ class AllocationSpace():
 		Formal parameters are counter an integer, which describes the index of the current startTB
 		and tflex of type FlexibleTask.
 	'''
-	def LocateKick(self,counter,tflex):
-		if(counter<0):
-			pointer=0
-		else:
-			pointer=counter
-		minPriority=self.space[pointer] #this keeps tracks of the lowest priority in the PriorityQueue
-
+	def LocateKickFlexible(self,task,timeRemaining):
+		#take note of the lowest prioruty
+		tokick=[]
+		sortedList=[]
+		tR=timeRemaining
 		for i in self.space:
-			if i.startTime >=tflex.lowerbound and i.startTime<tflex.upperbound:
-				if(isinstance(i.status,FlexibleTask) and i.status.priority>minPriority.status.priority):
-					minPriority=self.space[pointer]
-		if(minPriority.status.priority>tflex.priority):
-			return minPriority.status
+			if(i.endTime>task.lowerbound and i.endTime<=task.upperbound) or (i.startTime>=task.lowerbound and i.startTime<task.upperbound):
+				if isinstance(i.status,FlexibleTask):
+					if i.status.priority>task.priority:
+						heapq.heappush(sortedList,(i.status.priority,i))
+
+		for i in sortedList:
+			if tR<=0:
+				break
+			else:
+				tokick.append(i[1])
+				tR-=i[1].span
+				print (tR)
+		print (tR)
+		if(tR>0):
+			return []
 		else:
-			return None
-
-
-
+			return (tokick,tR)
 	'''method LocateKickFix
 		created January 29,2017	
 
@@ -683,41 +537,44 @@ class AllocationSpace():
 		The method returns a list of TimeBlocks.
 		Formal parameter is tfix of type FixTask.
 	'''
-	'''def LocateKickFix(self,tfix):
-		tokick=[] #this variable is a list of tasks to be kicked.
-		for i in self.space:
-			if (isinstance(i.status,FlexibleTask)):
-
-
-				if(i.startTime >= tfix.mustart and i.startTime<tfix.mustend):
-
-					tokick.append(i)										
-				elif(i.endTime <= tfix.mustend and i.endTime>tfix.mustart):
-					tokick.append(i)
-				elif(i.startTime<tfix.mustart and i.endTime>tfix.mustend) :
-					tokick.append(i)
-		for i in tokick:
-			print (i.startTime)
-		return tokick
-
-	'''
-	
-	def LocateKickFix(self,tfix):
+	def LocateKickFix(self,task):
 		tokick=[]
-		pointer=None
-		for i in range(0,len(self.space)):
-			if (tfix.mustart>=self.space[i].startTime and self.space[i].endTime>tfix.mustart):
-				pointer=i
-				break
-		while(self.space[pointer].startTime<tfix.mustend):
-			if(isinstance(self.space[pointer].status,FlexibleTask)):
-				tokick.append(self.space[pointer])
-			elif(isinstance(self.space[pointer].status,FixTask)):
-				return None
-			pointer+=1
+		startingPoint=None
+		endPoint=None
+		for i in self.space:
+			print (i.startTime,i.endTime)
+			if i.startTime >=task.mustart and i.startTime<task.mustend:
 
-		return tokick
+				if isinstance(i.status,FlexibleTask):
+					print ("to kicked",i.startTime)	
 
+					tokick.append(i.status)
+					if startingPoint==None:
+						startingPoint=i.startTime
+
+					endPoint=i.endTime
+				if i.isFree():
+					endPoint=i.endTime
+				if isinstance(i.status,FixTask):
+					return []
+			elif i.endTime >task.mustart and i.endTime<=task.mustend:
+				if isinstance(i.status,FixTask):
+					return []
+				if isinstance(i.status,FlexibleTask):
+					tokick.append(i.status)
+					if startingPoint==None:
+						startingPoint=i.startTime
+
+					endPoint=i.endTime
+				if i.isFree():
+					endPoint=i.endTime				
+
+		if startingPoint==None or endPoint==None:
+			return []
+		if endPoint - startingPoint >= task.duration:
+			return tokick
+		else:
+			return []
 
 	'''method Kick
 		created January 29,2017	
@@ -728,16 +585,12 @@ class AllocationSpace():
 		Formal parameter is tobekicked of type FlexibleTask.
 	'''
 	def Kick(self,tobekicked):
+
 		heapq.heappush(self.priorityQueue,(tobekicked.priority,tobekicked)) #heapq is a method from one of the modules of python
 		for i in self.space:
-			if isinstance(i.status,FlexibleTask):
-				if i.status.title==tobekicked.title:
+			if (isinstance(i.status,FlexibleTask)):
+				if id(i.status)==id(tobekicked):
 					i.status=None
-
-
-	def AllocateRemainingTime(self,counter,tflex,remainingTime):
-		pass
-
 	
 
 	'''method Merge
@@ -776,21 +629,133 @@ class AllocationSpace():
 			if (isinstance(self.space[head].status,FlexibleTask) and isinstance(self.space[head+1].status,FlexibleTask)):
 				if(self.space[head].status.title==self.space[head+1].status.title):
 					self.space[head].endTime=self.space[head+1].endTime
-					self.space[head].span==self.space[head].endTime-self.space[head].startTime
+					self.space[head].span=self.space[head].endTime-self.space[head].startTime
 					self.space.remove(self.space[head+1])
 			head+=1
 
 
+	def Load(self,filename):
+		f=open(filename,'r')
+
+		f.close()
+	def Save(self,filename):
+		f=open(filename,"w")
+		f.write(self.name+"\n")
+		#save task info
+		x={None}
+		for i in self.space:
+			if i.status!=None:
+				if isinstance(i.status,FixTask):
+					x.add((id(i.status),"fix",i.status.title,i.status.duration,i.status.mustart,i.status.mustend))
+				elif isinstance(i.status,FlexibleTask):
+					x.add((id(i.status),"flexible",i.status.title,i.status.duration,i.status.priority,i.status.lowerbound,i.status.upperbound))				
+
+			else:
+				x.add(None)
+		f.write(str(len(x))+"\n")
+		#save 
+		for i in x:
+			if i==None:
+				f.write(str(None))
+			else:
+				f.write(str(i))
+			f.write("\n")
+		#for in Timeblock
+
+		#save TimeBlocks info
+		f.write(str(len(self.space))+"\n")
+		for i in self.space:
+			if i.status==None:
+				f.write(str((i.startTime,i.endTime,i.span,i.status)))
+			elif isinstance(i.status,FixTask):
+				f.write(str((i.startTime,i.endTime,i.span,"Fix",id(i.status))))
+			elif isinstance(i.status,FlexibleTask):
+				f.write(str((i.startTime,i.endTime,i.span,"Flexible",id(i.status))))				
+			f.write("\n")
+		f.write(str(len(self.priorityQueue))+"\n")	
+		for i in self.priorityQueue:
+			f.write(str((i[1].title,i[1].duration,i[1].priority,i[1].lowerbound,i[1].upperbound)))
+		f.close()
+
+	def Partition(self,task):
+		freeSpace=[]
+		generatedSpace=0
+		for i in self.space:
+			if i.startTime>=task.lowerbound and i.endTime<=task.upperbound:
+				if i.isFree():
+					if(generatedSpace>=task.duration):
+						break
+
+
+					freeSpace.append(i)
+					generatedSpace+=i.span
+
+		if(generatedSpace>task.duration):
+			newTB=TimeBlock(freeSpace[-1].endTime-(generatedSpace-task.duration),freeSpace[-1].endTime,generatedSpace-task.duration,None)
+			index=self.space.index(freeSpace[-1])
+			self.space[index].endTime=newTB.startTime
+			self.space[index].span=self.space[index].endTime-self.space[index].startTime
+			self.space.insert(index+1,newTB)
+
+
+
+		if(generatedSpace>=task.duration):
+			for i in self.space:
+				if i in freeSpace:
+					i.status=task
+			print ("Allocation Successful")
+			return True
+		else:
+			timeRemaining=task.duration-generatedSpace
+			toKickTimeRemainingTuple=self.LocateKickFlexible(task,timeRemaining)
+			print (toKickTimeRemainingTuple[1])
+			if toKickTimeRemainingTuple[1]>0:
+				print ("Allocation Unsuccessful")
+				return False
+			for i in freeSpace:
+				i.status=task
+			for i in toKickTimeRemainingTuple[0]:
+				i.status=task
+
+			#SPLIT KAPAG SUMOBRA
+			#ilagay sa priorityqueue yung toKick
+			#SPLIT PAG SUMOBRA
+			'''if toKickTimeRemainingTuple[1]<0:
+				#split last added
+				print (toKickTimeRemainingTuple[0][-1])
+				index=self.space.index(toKickTimeRemainingTuple[0][-1])
+				newTB=TimeBlock(self.space[index].endTime+toKickTimeRemainingTuple[1],self.space[index].endTime,-(timeRemaining),None)
+				self.space[index].endTime=newTB.startTime
+				self.space[index].span=self.space[index].span+timeRemaining
+				self.space.insert(index+1,newTB)
+			'''
+			
+
+		self.Merge()
+
 if __name__=="__main__":
-	myAS=AllocationSpace("")
+	'''myAS=AllocationSpace("mySpace")
 	#myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
-	myAS.AllocateTime(FlexibleTask("A",300,1,400,700))	
-	myAS.AllocateTimeFix(FixTask("B",100,700,800))
-	myAS.AllocateTimeFix(FixTask("C",200,600,800))	
+	myAS.AllocateTime(FixTask("A",200,2200,2400))
+	myAS.GetData()			
+	myAS.AllocateTime(FixTask("B",200,2100,2300))
+	myAS.AllocateTime(FixTask("C",200,0,200))
+	myAS.AllocateTime(FixTask("D",400,800,1200))	
+	myAS.AllocateTime(FixTask("E",200,300,500))		
+	myAS.AllocateTime(FixTask("F",800,800,1600))
+	myAS.AllocateTime(FlexibleTask("H",100,1,600,1300))
+	#myAS.AllocateTime(FlexibleTask("G",200,1,500,800))		##
+
+	#myAS.AllocateTime(FixTask("I",100,600,700))						
+	myAS.GetData()	
+	myAS.AllocateTime(FixTask("J",100,600,700))
+	myAS.GetData()	
 	for i in myAS.priorityQueue:
 		if(myAS.AllocateTime(i[1])==True):
 			print ("true")
 			myAS.priorityQueue.pop()
 	myAS.GetData()	
-	#myAS.AllocateTime(FlexibleTask("B",100,1,1000,1100))		##
-	#pass
+	myAS.Save("myData.in")
+	'''
+
+	pass
