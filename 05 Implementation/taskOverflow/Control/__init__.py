@@ -31,6 +31,10 @@ Gerry Agluba Jr.
 last updated on January 31,2017
 Initial Software for Control Classes , its structures and methods.
 
+Robelle Silverio
+last updated on February 8, 2017
+Clear and Delete Method
+
 File created on January 29,2017.
 Developed by TaskOverflow group.
 
@@ -109,8 +113,8 @@ class AddTask():
 			if(task.mustend<=task.mustart ):
 				print ('error your mustend must be greater muststart') 
 				return False
-			if(task.duration !=task.mustend-task.mustart ):
-				print ('error your mustend must be greater muststart') 
+			if(int(task.duration) !=int(task.mustend-task.mustart) ):
+				print (task.mustend-task.mustart,'error your mustend must be greater muststart') 
 				return False	
 
 
@@ -182,7 +186,7 @@ class Menu():
 		while(True):
 			#os.system('cls')
 			AllocationSpace.GetData()		
-			print ("[A].Add task\t[Q].Quit\n")
+			print ("[A].Add task\t[C].Clear_Schedule\t[D].Delete\t[Q].Quit\n")
 			event=raw_input("") #this keeps tracks of the actions specified the user
 			if(event=="A"):
 				newT=None #this is a temporary variablee for the possible task to be created
@@ -198,6 +202,10 @@ class Menu():
 					try:
 						mustart=int(raw_input("enter start time\n")) #this variable takes note of the entered mustart
 						mustend=mustart+duration
+						print (mustend)
+						if(mustend%100>59):
+							mustend=mustend+40
+						print (mustend)
 					except ValueError as V:
 					    print(V)
 					else:
@@ -218,7 +226,11 @@ class Menu():
 						newT=Dat.FlexibleTask(title,duration,priority,lowerbound,upperbound)
 						newT=self.Allocator.addTask(newT,AllocationSpace,Partition)
 
-
+			elif(event=="C"):
+				AllocationSpace.Clear() #clears the timeblock (in its initial state: 0000 2400)
+			elif(event=="D"):
+				tasky=raw_input(("Enter name of task to delete:\n")) #tasky holds the title of the task that will be deleted
+				AllocationSpace.Dela(tasky) #calls the function that will delete the task which the user entered
 			if (event=="Q"):
 				break
 		print ("saving...")
