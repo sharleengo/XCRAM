@@ -31,6 +31,9 @@ Gerry Agluba Jr.
 last updated on January 31,2017
 Initial Software for Data Classes , its structures and methods.
 
+Robelle Silverio
+edited Get data method
+
 File created on January 29,2017.
 Developed by TaskOverflow group.
 
@@ -43,7 +46,8 @@ from __future__ import print_function
 
 import heapq
 import random
-
+import os
+import math
 '''
 For all Classes, no files or database tables had been used.
 module from python like heapq and random had been imported.
@@ -178,6 +182,7 @@ class AllocationSpace():
 		'''this constructor initializes the class and sets the name; new space is created and initialized priorityQueue to be empty'''
 		self.name=name #this variable describes the name of the AllocationSpace.
 		self.space=[TimeBlock(0,2400,2400,None)] #this variable is a list of timeBlocks, but is initially has only one primary TimeBlock
+		#self space should load the file
 		self.priorityQueue=[] #this variable is a list of task that is kicked throughout the Allocation, it is sorted according to priority
 		self.maxPriority=None #this variable indicates the current highest priority in the current space.
 
@@ -195,8 +200,10 @@ class AllocationSpace():
 		for i in self.space:
 			startTime=i.startTime-(i.startTime%100)+(i.startTime%100)*(60.0/100) #this variable is a recomputed startTime for data output purposes
 			endTime=i.endTime-(i.endTime%100)+(i.endTime%100)*(60.0/100) #this variable is a recomputed endTime for data output purposes
+			#span= (int(i.span/100)*100+(i.span%100)*(60.0/100))
+			i.span=math.ceil(i.span)
 			span=i.span-(i.span%100)+(i.span%100)*(60.0/100) #this variable is a recomputed span for data output purposes	
-
+			
 			print ("\n",int(startTime),"\t",int(endTime),"\t",int(span),end="\t")
 			if isinstance(i.status,FlexibleTask):
 				print (i.status.title,i.status.priority)
@@ -270,7 +277,7 @@ class AllocationSpace():
 		
 				else:
 					print ("proceeding to partinioning")
-					return self.Partition(task)
+					self.Partition(task)
 
 
 
@@ -521,13 +528,15 @@ class AllocationSpace():
 				break
 			else:
 				tokick.append(i[1])
-				tR-=i[1].span
 				print (tR)
-		print (tR)
-		if(tR>0):
+				print ("span",i[1].span)
+				tR-=i[1].span
+		if(int(tR)>0):
 			return []
 		else:
 			return (tokick,tR)
+
+
 	'''method LocateKickFix
 		created January 29,2017	
 
@@ -636,7 +645,60 @@ class AllocationSpace():
 
 	def Load(self,filename):
 		f=open(filename,'r')
+			#check if the file is empty
+		if os.path.getsize(filename) > 0:
+			self.name = f.readline()
+			f.readline()
+			taskList=[]
+			#taskList.append(None)
+			numTask=int(f.readline())
+			f.readline()
+			for i in range(0,numTask-1):
+				t=f.readline()
+				t = t[1:-2]
+				t=t.split(',')
+				t[0]=int(t[0])
+				t[1]=t[1].strip("'")
+				t[1]=t[1].strip(" '")
+				t[2]=t[2].strip("'")
+				t[2]=t[2].strip(" '")	
+				t[3]=float(t[3])			
+				t[4]=float(t[4])			
+				t[5]=float(t[5])	
+				if(t[1]=='fix'):
+					nt=FixTask(t[2],t[3],t[4],t[5])
+				elif(t[1]=='flexible'):
+					t[6]=float(t[6])
+					nt=FlexibleTask(t[2],t[3],t[4],t[5],t[6])
 
+				taskList.append((nt,t[0]))
+
+			print (taskList)
+			numTB=int(f.readline())
+			self.space=[]
+			for i in range(0,numTB):
+				tb=f.readline()
+				tb = tb[1:-2]
+				tb=tb.split(',')
+				tb[0]=float(tb[0])
+				tb[1]=float(tb[1])
+				tb[2]=float(tb[2])
+				tb[3]=tb[3].strip("'")
+				tb[3]=tb[3].strip(" '")	
+				if (tb[3]!='None'):
+					tb[4]=int(tb[4])
+					nTB=TimeBlock(tb[0],tb[1],tb[2],None)
+					for i in taskList:
+						if i[1]==tb[4]:
+							nTB.status=i[0]
+							self.space.append(nTB)
+				else:
+					nTB=TimeBlock(tb[0],tb[1],tb[2],None)
+					self.space.append(nTB)
+			self.GetData()
+
+		else:
+			"print file is empty"
 		f.close()
 	def Save(self,filename):
 		f=open(filename,"w")
@@ -647,6 +709,7 @@ class AllocationSpace():
 			if i.status!=None:
 				if isinstance(i.status,FixTask):
 					x.add((id(i.status),"fix",i.status.title,i.status.duration,i.status.mustart,i.status.mustend))
+					#print i.status.title
 				elif isinstance(i.status,FlexibleTask):
 					x.add((id(i.status),"flexible",i.status.title,i.status.duration,i.status.priority,i.status.lowerbound,i.status.upperbound))				
 
@@ -655,11 +718,13 @@ class AllocationSpace():
 		f.write(str(len(x))+"\n")
 		#save 
 		for i in x:
+
 			if i==None:
 				f.write(str(None))
 			else:
 				f.write(str(i))
 			f.write("\n")
+
 		#for in Timeblock
 
 		#save TimeBlocks info
@@ -672,90 +737,121 @@ class AllocationSpace():
 			elif isinstance(i.status,FlexibleTask):
 				f.write(str((i.startTime,i.endTime,i.span,"Flexible",id(i.status))))				
 			f.write("\n")
-		f.write(str(len(self.priorityQueue))+"\n")	
+		
+		'''f.write(str(len(self.priorityQueue))+"\n")	
 		for i in self.priorityQueue:
 			f.write(str((i[1].title,i[1].duration,i[1].priority,i[1].lowerbound,i[1].upperbound)))
-		f.close()
+		f.close()''' #I COMMENTED THIS BECAUSE THERE'S NO NEED TO SAVE THE PRIORITYQUEUE
 
 	def Partition(self,task):
+		print ("partitioning...")
 		freeSpace=[]
 		generatedSpace=0
+
 		for i in self.space:
 			if i.startTime>=task.lowerbound and i.endTime<=task.upperbound:
 				if i.isFree():
 					if(generatedSpace>=task.duration):
 						break
-
-
+					print (i.startTime,i.endTime,i.span)
 					freeSpace.append(i)
 					generatedSpace+=i.span
 
 		if(generatedSpace>task.duration):
+			#split yung last na in-add mo
 			newTB=TimeBlock(freeSpace[-1].endTime-(generatedSpace-task.duration),freeSpace[-1].endTime,generatedSpace-task.duration,None)
 			index=self.space.index(freeSpace[-1])
-			self.space[index].endTime=newTB.startTime
-			self.space[index].span=self.space[index].endTime-self.space[index].startTime
+			self.space[index].endTime=newTB.startTimes
+			self.space[index].span=(self.space[index].endTime-self.space[index].startTime)
+
 			self.space.insert(index+1,newTB)
 
 
 
-		if(generatedSpace>=task.duration):
+		print ("generateSpace/taskduration",generatedSpace,float(task.duration))
+		if(abs(generatedSpace-task.duration)<=1):#hindi gumagana yung comparision lang, kaya naglagay ako ng degree of error
 			for i in self.space:
 				if i in freeSpace:
 					i.status=task
 			print ("Allocation Successful")
-			return True
 		else:
+			print ("kicking lower priorities")
 			timeRemaining=task.duration-generatedSpace
 			toKickTimeRemainingTuple=self.LocateKickFlexible(task,timeRemaining)
-			print (toKickTimeRemainingTuple[1])
+			#print ("tokici")
+			#print (toKickTimeRemainingTuple[1])
+			print ("time remaining: ",toKickTimeRemainingTuple[1])
 			if toKickTimeRemainingTuple[1]>0:
 				print ("Allocation Unsuccessful")
 				return False
+
+
+
+			for i in toKickTimeRemainingTuple[0]:
+				self.Kick(i.status)				
 			for i in freeSpace:
 				i.status=task
 			for i in toKickTimeRemainingTuple[0]:
 				i.status=task
-
-			#SPLIT KAPAG SUMOBRA
-			#ilagay sa priorityqueue yung toKick
-			#SPLIT PAG SUMOBRA
-			'''if toKickTimeRemainingTuple[1]<0:
-				#split last added
-				print (toKickTimeRemainingTuple[0][-1])
-				index=self.space.index(toKickTimeRemainingTuple[0][-1])
-				newTB=TimeBlock(self.space[index].endTime+toKickTimeRemainingTuple[1],self.space[index].endTime,-(timeRemaining),None)
-				self.space[index].endTime=newTB.startTime
-				self.space[index].span=self.space[index].span+timeRemaining
-				self.space.insert(index+1,newTB)
-			'''
-			
+			if (toKickTimeRemainingTuple[1]-0<1):
+				print ("splitting excess")
+				excess=int(-toKickTimeRemainingTuple[1])
+				for i in freeSpace:
+					if i.span>excess:
+						#split
+						newTB=TimeBlock(i.endTime-excess,i.endTime,excess,None)
+						index=self.space.index(i)
+						self.space[index].endTime=newTB.startTime
+						self.space[index].span=self.space[index].endTime-self.space[index].startTime
+						self.space.insert(index+1,newTB)
 
 		self.Merge()
-
+		
+	#this method will clear the timeblock
+	def Clear(self):
+		self.space=[TimeBlock(0,2400,2400,None)] #this variable is a list of timeBlocks, but is initially has only one primary TimeBlock
+		#self space should load the file
+		self.priorityQueue=[] #this variable is a list of task that is kicked throughout the Allocation, it is sorted according to priority
+		self.maxPriority=None #this variable indicates the current highest priority in the current space.
+		print ("saving...")
+		self.Save("Data\DataFiles\myData.in")
+	'''this method will delete user's selected task
+		arguemnts are:
+		self- the object AllocationSpace
+		tasky- task to be deleted
+		TimeBlock- the object TimeBlock
+		
+		this method returns nothing
+	'''
+	def Dela(self,tasky):
+		check=0
+		for i in self.space:
+			if isinstance(i.status,FixTask):
+				if (i.status.title==tasky):
+					i.status=None
+					check=1
+			elif isinstance(i.status,FlexibleTask):
+				if isinstance(i.status,FlexibleTask):
+					if (i.status.title==tasky):
+						i.status=None
+						check=1
+		if check==0:
+			print ("Task is not in the schedule")
+		self.Merge()
+		print ("saving...")
+		self.Save("Data\DataFiles\myData.in")
+			
 if __name__=="__main__":
 	'''myAS=AllocationSpace("mySpace")
-	#myAS.AllocateTime(FlexibleTask("A",800,1,0,800))
-	myAS.AllocateTime(FixTask("A",200,2200,2400))
-	myAS.GetData()			
-	myAS.AllocateTime(FixTask("B",200,2100,2300))
-	myAS.AllocateTime(FixTask("C",200,0,200))
-	myAS.AllocateTime(FixTask("D",400,800,1200))	
-	myAS.AllocateTime(FixTask("E",200,300,500))		
-	myAS.AllocateTime(FixTask("F",800,800,1600))
-	myAS.AllocateTime(FlexibleTask("H",100,1,600,1300))
-	#myAS.AllocateTime(FlexibleTask("G",200,1,500,800))		##
-
-	#myAS.AllocateTime(FixTask("I",100,600,700))						
+	myAS.AllocateTime(FixTask("B",100,700+(20.0/60*100),800+(20.0/60*100)))	
+	myAS.AllocateTime(FlexibleTask("H",100,2,900+(20.0/60*100),2400),True)
 	myAS.GetData()	
-	myAS.AllocateTime(FixTask("J",100,600,700))
+	myAS.AllocateTime(FlexibleTask("I",250,1,800+(20.0/60*100),1100+(20.0/60*100)),True)
 	myAS.GetData()	
 	for i in myAS.priorityQueue:
 		if(myAS.AllocateTime(i[1])==True):
-			print ("true")
 			myAS.priorityQueue.pop()
-	myAS.GetData()	
-	myAS.Save("myData.in")
-	'''
+
+	myAS.GetData()	'''
 
 	pass
