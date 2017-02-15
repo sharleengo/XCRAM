@@ -42,9 +42,9 @@ Software Project (Task OverFlow).
 
 import Data.__init__ as Dat
 import Control.__init__  as Con
-import UI.__init__ as UI
+#import UI.__init__ as UI
 
-import pygame
+#import pygame
 
 
 '''
@@ -70,11 +70,12 @@ class main():
 	'''	
 	def __init__(self):
 		self.myAllocationSpace=Dat.AllocationSpace("myTasks") #intializes an instance of AllocationSpace
-		
+		self.myAllocationSpace.Load("Data\DataFiles\myData.in")
+		self.Allocator=Con.AddTask()
 		self.Allocator=Con.Menu() #initializes an instance of Menu Class
 		self.Allocator.ActiveState(self.myAllocationSpace) 
 		#pygame.init()
-		#myUI=UI.mainUI(self.myAllocationSpace)
+		#myUI=UI.mainUI(self.myAllocationSpace,self.Allocator)
 	def loadData(self,fileName):
 		pass
 
