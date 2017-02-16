@@ -808,7 +808,7 @@ class AllocationSpace():
 			#split yung last na in-add mo
 			newTB=TimeBlock(freeSpace[-1].endTime-(generatedSpace-task.duration),freeSpace[-1].endTime,generatedSpace-task.duration,None)
 			index=self.space.index(freeSpace[-1])
-			self.space[index].endTime=newTB.startTimes
+			self.space[index].endTime=newTB.startTime
 			self.space[index].span=(self.space[index].endTime-self.space[index].startTime)
 
 			self.space.insert(index+1,newTB)
