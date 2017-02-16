@@ -70,7 +70,7 @@ class main():
 	'''	
 	def __init__(self):
 		self.myAllocationSpace=Dat.AllocationSpace("myTasks") #intializes an instance of AllocationSpace
-		self.myAllocationSpace.Load("Data\DataFiles\myData.in")
+		self.myAllocationSpace.Load("Data/DataFiles/myData.in")
 		self.Allocator=Con.AddTask()
 		self.Allocator=Con.Menu() #initializes an instance of Menu Class
 		self.Allocator.ActiveState(self.myAllocationSpace) 
