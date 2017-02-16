@@ -1,7 +1,7 @@
 '''
 MIT License
 
-Copyright (c) 2017 Gerry P. Agluba Jr.
+Copyright (c) 2017 Gerry P. Agluba Jr, Robelle Silverio.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,8 @@ of the Department of Computer Science, College of Engineering,
 University of the Philippines, Diliman for the AY 2016-2017
 
 Gerry Agluba Jr.
-last updated on January 31,2017
+Robelle Silverio
+last updated on Febbruary 16,2017
 Initial Software for Data Classes , its structures and methods.
 
 Robelle Silverio
@@ -218,17 +219,18 @@ class AllocationSpace():
 
 
 	'''method AllocateTime
-		created January 29,2017	
+		created February 8,2017	
 
-		This method is the core Allocation Algorithm for flexible tasks. 
+		This method is the core Allocation Algorithm for a given task. 
 		It returns a boolean value True if the allocation is successful, otherwise False.
-		The formal parameter tflex is of type FlexibleTask.
+		The formal parameter is task of type Task, and an optional boolen parameter Partition.
+		This paramter is initialized to be False, and this gives information if
+		a user wants to partition its task.
 	'''
 	def AllocateTime(self,task,Partition=False):
 		print ("allocating",task.title)
 
-		#saving current data...
-		oldSpace=[] #this cariable is a list the saves the current space in case the Allocation fails and needs to be undone.
+		oldSpace=[] #this variable is a list the saves the current space in case the Allocation fails and needs to be undone.
 		#print (self.space)
 
 		for i in self.space:
@@ -239,7 +241,6 @@ class AllocationSpace():
 		if(isinstance(task,FixTask)):
 			TB=self.SearchFreeTimeBlockFix(task)
 			if TB!=None:
-				print (TB.startTime)
 				TB.status=task
 				self.Merge()
 				print ("Allocation Successful.")
@@ -255,16 +256,13 @@ class AllocationSpace():
 
 					self.Merge()
 					TB=self.SearchFreeTimeBlockFix(task)
-					print ("haha",TB.startTime)		
 					TB.status=task
 					print ("Allocation Successful.")
 					return True				
 
 		elif (isinstance(task,FlexibleTask)):
 			TB=self.SearchFreeTimeBlockFlex(task)
-			print ("eto nahanap ko",TB)
 			if TB!=None:
-
 				TB.status=task
 				self.Merge()
 				print ("Allocation Successful")
@@ -282,7 +280,14 @@ class AllocationSpace():
 
 
 
+	'''method SeachFreeTimeBlockFix
+		created January 29,2017	
 
+		This method basically searches for free blocks if a given task to be added is fix.
+		Searchinf free timeblocks is different for each type of task. (see method, searchFreeTimeBlockFlex).
+		It returns a free block enough for a fixtask to be allocated.
+		The formal parameter is task of type FixTask.
+	'''
 	def SearchFreeTimeBlockFix(self,task):
 		'''
 			for all blocks, check if it overlaps wit task's time range. it check if it is enough
@@ -304,6 +309,14 @@ class AllocationSpace():
 						return TB
 		return None
 	
+	
+	'''method SeachFreeTimeBlockFlex
+		created January 29,2017	
+
+		This method basically searches for free blocks if a given task to be added is flexible.
+		It returns a free block enough for a fixtask to be allocated.
+		The formal parameter is task of type FlexibleTask.
+	'''
 	def SearchFreeTimeBlockFlex(self,task):
 		'''start with checking if the bounds are in the middle of a Free Block
 		if it is, temporarily split it because we have to cut overlaps for searching precision
@@ -338,16 +351,13 @@ class AllocationSpace():
 						return TB										
 		return None
 
-	'''method SearchStartingFlexibleTaskTimeBlock
+	'''method inTheMiddle
 		created January 29,2017	
 
-		This method is responsible in searching for possible Free TimeBlock of status flexibleTask 
-		that is contained in the bounds in of tflex. This method is used when SearchStartingTimeBlock method
-		fails.
-		It returns a value of type TimeBlock in case the search is successful, otherwise it returns None.
-		The formal parameter is of tflex is of type FlexibleTask.
+		This method checks if a task is contained exactly in the span of a timeblock.
+		It returns True if such condition is satisfied, Otherwise it returns false.
+		Formal parameters are TB and t of type TimeBlock and Task respectively.
 	'''
-
 	def exactlyFitted(self,TB,t):
 		if isinstance(t,FlexibleTask):
 			if t.duration==TB.span:
@@ -366,7 +376,7 @@ class AllocationSpace():
 
 		This method checks if a task is contained between span of a timeblock.
 		It returns True if such condition is satisfied, Otherwise it returns false.
-		Formal parameters are startTB and tflex of type TimeBlock and Task respectively.
+		Formal parameters are TB and t of type TimeBlock and Task respectively.
 	'''
 	def inTheMiddle(self,TB,t):
 
@@ -644,6 +654,13 @@ class AllocationSpace():
 			head+=1
 
 
+	'''method Load
+		created February 08,2017	
+
+		This method is the main function for loading data from our files.
+		It parses the file input so that it matches the current state of the AllocationSpace.
+		This method has formal parameter filename of type string.
+	'''
 	def Load(self,filename):
 		f=open(filename,'r')
 			#check if the file is empty
@@ -701,6 +718,18 @@ class AllocationSpace():
 		else:
 			"print file is empty"
 		f.close()
+
+
+	'''method Save
+		created February 08,2017	
+
+		This method is the main function for saving data into our files.
+		The method functions by first saving all infomration about all the tasks.
+		It involves adding some refrenceNumber in order for the method Load 
+		to properly identify which task is contained in a specific TimeBlock.
+		Morover, it saves informations about the AllocationSpace, the timeblocks. etc.
+		This method has formal parameter filename of type string.
+	'''
 	def Save(self,filename):
 		f=open(filename,"w")
 		f.write(self.name+"\n")
@@ -744,6 +773,23 @@ class AllocationSpace():
 			f.write(str((i[1].title,i[1].duration,i[1].priority,i[1].lowerbound,i[1].upperbound)))
 		f.close()''' #I COMMENTED THIS BECAUSE THERE'S NO NEED TO SAVE THE PRIORITYQUEUE
 
+
+
+	'''method Partition
+		created February 08,2017	
+
+		This method, basically partition a task into multiple timeblocks if in case,
+		if there is not anough space in the bounds of the task(note: partition is only available for flexible task)
+		First it searches and take notes of the the free space withing the bounds.
+		If the space is enough., then allocation follows. If not,
+		kicking of flexible priorities is enforced. Kicking is ended, if such space 
+		is generated and allocation follows. If in case kicking fails, or generated
+		space is still not enough, then Allocation is aborted. and state of the AllocationSpace
+		is redone.
+
+		This medthod returns False if partitioning fails.
+		Formal parameters is task of type FlexibleTask. 
+	'''
 	def Partition(self,task):
 		print ("partitioning...")
 		freeSpace=[]
@@ -780,10 +826,14 @@ class AllocationSpace():
 			print ("kicking lower priorities")
 			timeRemaining=task.duration-generatedSpace
 			toKickTimeRemainingTuple=self.LocateKickFlexible(task,timeRemaining)
-			#print ("tokici")
-			#print (toKickTimeRemainingTuple[1])
-			print ("time remaining: ",toKickTimeRemainingTuple[1])
+
+			if (toKickTimeRemainingTuple==[]): #list is empty 
+				self.Merge()
+				print ("Allocation Unsuccessful")
+				return False
+
 			if toKickTimeRemainingTuple[1]>0:
+				self.Merge()
 				print ("Allocation Unsuccessful")
 				return False
 
@@ -820,7 +870,12 @@ class AllocationSpace():
 
 		self.Merge()
 		
-	#this method will clear the timeblock
+
+	'''method Clear
+		created February 08,2017
+		This method clear the whole AllocationSpace.
+		This wil be refected to the file, because saving is done.
+	'''
 	def Clear(self):
 		self.space=[TimeBlock(0,2400,2400,None)] #this variable is a list of timeBlocks, but is initially has only one primary TimeBlock
 		#self space should load the file
@@ -828,6 +883,8 @@ class AllocationSpace():
 		self.maxPriority=None #this variable indicates the current highest priority in the current space.
 		print ("saving...")
 		self.Save("Data\DataFiles\myData.in")
+
+
 	'''this method will delete user's selected task
 		arguemnts are:
 		self- the object AllocationSpace
@@ -855,16 +912,4 @@ class AllocationSpace():
 		self.Save("Data\DataFiles\myData.in")
 			
 if __name__=="__main__":
-	'''myAS=AllocationSpace("mySpace")
-	myAS.AllocateTime(FixTask("B",100,700+(20.0/60*100),800+(20.0/60*100)))	
-	myAS.AllocateTime(FlexibleTask("H",100,2,900+(20.0/60*100),2400),True)
-	myAS.GetData()	
-	myAS.AllocateTime(FlexibleTask("I",250,1,800+(20.0/60*100),1100+(20.0/60*100)),True)
-	myAS.GetData()	
-	for i in myAS.priorityQueue:
-		if(myAS.AllocateTime(i[1])==True):
-			myAS.priorityQueue.pop()
-
-	myAS.GetData()	'''
-
 	pass
