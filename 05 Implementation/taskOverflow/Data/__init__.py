@@ -804,6 +804,8 @@ class AllocationSpace():
 					freeSpace.append(i)
 					generatedSpace+=i.span
 
+		for i in freeSpace:
+			print ("ASDASDASDD",i.startTime,i.span)
 		if(generatedSpace>task.duration):
 			#split yung last na in-add mo
 			newTB=TimeBlock(freeSpace[-1].endTime-(generatedSpace-task.duration),freeSpace[-1].endTime,generatedSpace-task.duration,None)
@@ -812,6 +814,7 @@ class AllocationSpace():
 			self.space[index].span=(self.space[index].endTime-self.space[index].startTime)
 
 			self.space.insert(index+1,newTB)
+			generatedSpace-=(generatedSpace-task.duration)
 		self.GetData()
 
 
@@ -857,7 +860,7 @@ class AllocationSpace():
 						self.space[index].endTime=newTB.startTime
 						self.space[index].span=self.space[index].endTime-self.space[index].startTime
 						self.space.insert(index+1,newTB)
-
+						break
 				self.GetData()
 
 
