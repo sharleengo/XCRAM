@@ -38,6 +38,7 @@ class mainUI():
 		AllocationHeader=Wid.MenuBar((100,50),(229,204,255),(400,50))		#add header for timetable
 		font = pygame.font.SysFont('Helvetica', 18)							#set font 
 
+		myAddTaskUI=myTaskInfoUI=None
 		UnfixedWidget=[]												#initialize Widget, this helps in the drawing,redrawing and undrawing of addTaskUI
 
 		AppExit=False														#set loop exit to false
@@ -55,9 +56,10 @@ class mainUI():
 		move=0
 		scroll_y=0
 
+
 		switch=0
 		ms=0
-		task=Wid.Button((200,100),(184,25,255),(300,1))
+		task=Wid.TimeBlockUI((200,200),(184,25,255),(300,1))
 		while not AppExit:
 			for event in pygame.event.get():
 
@@ -147,6 +149,13 @@ class mainUI():
 							elif  not util.isMouseover(myMouse.get_pos(),UnfixedWidget[-1].priority): 	#
 								UnfixedWidget[-1].priority.unhighlight((255,255,255))
 								UnfixedWidget[-1].priority.font_col=(0,0,0)
+							if util.isMouseover(myMouse.get_pos(),task):			#higlights the addbutton in addTASKUI
+								print "im here"
+								task.highlight((205,155,255))
+								#UnfixedWidget[-1].priority.font_col=(242,242,242)
+							elif  not util.isMouseover(myMouse.get_pos(),task): 	#
+								task.unhighlight((184,25,255))
+								#UnfixedWidget[-1].priority.font_col=(0,0,0)
 
 
 
@@ -157,7 +166,16 @@ class mainUI():
 								myAddTaskUI=Wid.AddTaskUI((200,175),(450,350),(229,204,255))
 								UnfixedWidget.append(myAddTaskUI)						
 								addTask=True
-							'''this block of code initializes addTASKUI if add button is clicked'''
+
+
+							elif util.isMouseover(myMouse.get_pos(),task):
+								myTaskInfoUI=Wid.AddTaskUI((200,175),(450,350),(229,204,255))
+								myTaskInfoUI.extractData(task)
+								myTaskInfoUI.add.text="  Save "
+								UnfixedWidget.append(myTaskInfoUI)
+								addTask=True
+
+								#addTask=True
 
 						elif addTask==True:
 							#title
@@ -180,7 +198,7 @@ class mainUI():
 								UnfixedWidget[-1].isgetDuration=False
 								getdurationcounter=0
 							#duration minute
-							if util.isMouseover(myMouse.get_pos(),myAddTaskUI.durationbuttonmm):
+							if util.isMouseover(myMouse.get_pos(),UnfixedWidget[-1].durationbuttonmm):
 								#myAddTaskUI.durationbuttonmm.text="0 0"
 								print "get duration"
 								if UnfixedWidget[-1].isgetDuration==False:
@@ -219,7 +237,7 @@ class mainUI():
 									UnfixedWidget[-1].isgetmustart=False
 									getmustartcounter=0
 								#duration minute
-								if util.isMouseover(myMouse.get_pos(),myAddTaskUI.mustartmm):
+								if util.isMouseover(myMouse.get_pos(),UnfixedWidget[-1].mustartmm):
 									#myAddTaskUI.durationbuttonmm.text="0 0"
 									print "get mustart"
 									if UnfixedWidget[-1].isgetmustart==False:
@@ -243,7 +261,7 @@ class mainUI():
 									UnfixedWidget[-1].isgetlowerbound=False
 									getlowerboundcounter=0
 								#duration minute
-								if util.isMouseover(myMouse.get_pos(),myAddTaskUI.lowerboundmm):
+								if util.isMouseover(myMouse.get_pos(),UnfixedWidget[-1].lowerboundmm):
 									#myAddTaskUI.durationbuttonmm.text="0 0"
 									print "get lowrbound"
 									if UnfixedWidget[-1].isgetlowerbound==False:
@@ -261,7 +279,7 @@ class mainUI():
 									UnfixedWidget[-1].isgetupperbound=False
 									getupperboundcounter=0
 								#duration minute
-								if util.isMouseover(myMouse.get_pos(),myAddTaskUI.upperboundmm):
+								if util.isMouseover(myMouse.get_pos(),UnfixedWidget[-1].upperboundmm):
 									#myAddTaskUI.durationbuttonmm.text="0 0"
 									print "get upperbound"
 									if UnfixedWidget[-1].isgetupperbound==False:
@@ -288,12 +306,18 @@ class mainUI():
 							#cancel
 							if util.isMouseover(myMouse.get_pos(),UnfixedWidget[-1].cancel):
 								print "cancel"
-								UnfixedWidget.remove(myAddTaskUI)
+								if myAddTaskUI in UnfixedWidget:
+									UnfixedWidget.remove(myAddTaskUI)
+								if myTaskInfoUI in UnfixedWidget:
+									UnfixedWidget.remove(myTaskInfoUI)
 								addTask=False
 								getTitle=False
 							elif util.isMouseover(myMouse.get_pos(),UnfixedWidget[-1].add):
 								print "add"
-								UnfixedWidget.remove(myAddTaskUI)
+								if myAddTaskUI in UnfixedWidget:
+									UnfixedWidget.remove(myAddTaskUI)
+								if myTaskInfoUI in UnfixedWidget:
+									UnfixedWidget.remove(myTaskInfoUI)
 								addTask=False
 								getTitle=False
 
@@ -354,16 +378,18 @@ class mainUI():
 				scroll_y+=10
 			elif keys[pygame.K_PAGEDOWN]:
 				scroll_y-=10
+
+
 			elif keys[K_BACKSPACE]:
 				if addTask==True:
 					if getTitle==True:
 						UnfixedWidget[-1].backspace()
 
-			#check for hold keys
-
-			AppDisplay.blit(bg,(0,0))
-			
 			pygame.draw.rect(AppDisplay,(200,200,200),(98,50,404,550))
+			task.position=(task.position[0],200+scroll_y)
+			#check for hold keys
+			AppDisplay.blit(bg,(0,0))
+
 
 
 			if(scroll_y<-450):
@@ -371,6 +397,20 @@ class mainUI():
 			if(scroll_y>250):
 				scroll_y=250
 			AppDisplay.blit(timetable,(100,-200+scroll_y))
+			#task.position=(task.position[0],task.position[1]+scroll_y)
+
+
+			if util.isMouseover(myMouse.get_pos(),task):
+				task.color=(205,155,255)
+			if not util.isMouseover(myMouse.get_pos(),task):
+				task.color=(184,25,255)
+
+			if move<=1:
+				move+=.05
+				pos=50*move
+				task.dimension=(task.dimension[0],pos)
+			pygame.draw.rect(AppDisplay,task.color,(task.position,task.dimension))
+			#pygame.draw.rect(AppDisplay,task.color,((task.position[0],task.position[1]+scroll_y),task.dimension))
 
 			myMenuBar.draw(AppDisplay)
 			addButton.draw(AppDisplay)
@@ -388,11 +428,7 @@ class mainUI():
 						switch=1
 			
 			'''test dynamics'''
-			if move<=1:
-				move+=.05
-				pos=200*move
-				task.dimension=(task.dimension[0],pos)
-			pygame.draw.rect(AppDisplay,task.color,(task.position,task.dimension))
+
 
 
 			for i in UnfixedWidget:
@@ -418,7 +454,7 @@ class mainUI():
 
 			
 
-			clock.tick(500)
+			clock.tick(30)
 			#pygame.draw.rect(AppDisplay,task.color,(task.position,task.dimension))
 
 		pygame.quit()
