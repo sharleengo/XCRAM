@@ -35,6 +35,14 @@ class Button(pygame.Rect):
 		l[index]=char
 		self.text=''.join(l)
 
+class TimeBlockUI(Button):
+	def __init__(self,position,color,dimension,text=None,font_col=(200,200,200),bold=False):
+		Button.__init__(self,position,color,dimension,text=None,font_col=(200,200,200),bold=False)
+		self.title="Study"
+		self.duration=100
+		self.type="fix"
+		self.mustart=800
+
 class MenuBar(pygame.Rect):
 	def __init__(self,position,color,dimension,text=None):
 		self.position=position
@@ -165,6 +173,20 @@ class AddTaskUI(pygame.Rect):
 	def backspace(self):
 		if len(self.input.text)>6:
 			self.input.text = self.input.text[:-1]
+
+	def extractData(self,TBUI):
+		self.isgetDuration=False
+		self.isgetmustart=False
+		self.isgetlowerbound=False
+		self.isgetupperbound=False
+		self.isgetpriority=False
+
+		self.input.text+=TBUI.title
+
+		self.durationbuttonhh.text=str(TBUI.duration/1000)+' '+str((TBUI.duration%1000)/100)
+		self.durationbuttonmm.text=str((TBUI.duration%100)/10)+' '+str((TBUI.duration%10))
+		self.mustarthh.text=str(TBUI.mustart/1000)+' '+str((TBUI.mustart%1000)/100)
+		self.mustartmm.text=str((TBUI.mustart%100)/10)+' '+str((TBUI.mustart%10))
 
 	def draw(self,surface):
 		#self.rect = pygame.Rect(self.position, self.dimension)
