@@ -42,6 +42,10 @@ class TimeBlockUI(Button):
 		self.duration=100
 		self.type="fix"
 		self.mustart=800
+		self.font = pygame.font.SysFont('Helvetica', 18)
+	def addText(self,surface):
+		if self.title!=None:	
+			surface.blit(self.font.render(self.title, True, (0,0,0)), (self.position[0]+5,self.position[1]+5))			
 
 class MenuBar(pygame.Rect):
 	def __init__(self,position,color,dimension,text=None):
@@ -58,7 +62,7 @@ class MenuBar(pygame.Rect):
 
 class Input(pygame.sprite.Sprite):
 	def __init__(self,position,dimension,text=None):
-		image="Resources\inputimg2.png"
+		image="Resources/inputimg2.png"
 		self.image=pygame.image.load(image).convert()
 		self.image.set_alpha(75)
 		self.position=position

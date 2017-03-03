@@ -95,7 +95,12 @@ def getinputothers(Object,counter,event,condition):
 					UnfixedWidget[-1].lowerboundhh.text="2 3"
 				if int(buttonmm.text[0]+buttonmm.text[2])>=60:
 					UnfixedWidget[-1].lowerboundmm.text="5 9"
-
+			elif condition==UnfixedWidget[-1].isgetupperbound:
+				print buttonmm
+				if int(buttonhh.text[0]+buttonhh.text[2])>=24:
+					UnfixedWidget[-1].upperboundhh.text="2 3"
+				if int(buttonmm.text[0]+buttonmm.text[2])>=60:
+					UnfixedWidget[-1].upperboundmm.text="5 9"
 
 	return UnfixedWidget,counter
 

@@ -21,8 +21,8 @@ class mainUI():
 		pygame.init() 		#initialize pygame
 		AppDisplay=pygame.display.set_mode((WIN_SIZE_X,WIN_SIZE_Y)) 		#draw the window
 		#AppDisplay.fill((221,247,251,100))
-		bg = pygame.image.load("Resources\\background.png").convert() 		#add the background
-		timetable=pygame.image.load("Resources\\timetable.png").convert() 	#add the timetable
+		bg = pygame.image.load("Resources/background.png").convert() 		#add the background
+		timetable=pygame.image.load("Resources/timetable.png").convert() 	#add the timetable
 		timetable=pygame.transform.scale(timetable,(400,1200)) 				
 
 		bg1=pygame.transform.scale(bg,(800,30)) 							#add loweborder
@@ -59,7 +59,7 @@ class mainUI():
 
 		switch=0
 		ms=0
-		task=Wid.TimeBlockUI((200,200),(184,25,255),(300,1))
+		task=Wid.TimeBlockUI((200,200),(184,25,255),(300,1),"study",(0,0,0),False)
 		while not AppExit:
 			for event in pygame.event.get():
 
@@ -409,7 +409,9 @@ class mainUI():
 				move+=.05
 				pos=50*move
 				task.dimension=(task.dimension[0],pos)
+			task.addText(AppDisplay)
 			pygame.draw.rect(AppDisplay,task.color,(task.position,task.dimension))
+
 			#pygame.draw.rect(AppDisplay,task.color,((task.position[0],task.position[1]+scroll_y),task.dimension))
 
 			myMenuBar.draw(AppDisplay)
