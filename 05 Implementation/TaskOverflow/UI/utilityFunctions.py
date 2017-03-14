@@ -22,36 +22,30 @@ def get_key():
       pass		
 
 def getinputothers(Object,counter,event,condition):
+
 	UnfixedWidget=Object
 
 	buttonhh=buttonmm=None
 	buttonp=None
 
-	if condition==UnfixedWidget[-1].isgetDuration:
+
+	if id(condition)==id(UnfixedWidget[-1].isgetDuration):
 		buttonhh=UnfixedWidget[-1].durationbuttonhh
 		buttonmm=UnfixedWidget[-1].durationbuttonmm
-	elif condition==UnfixedWidget[-1].isgetmustart:
-		print "haha told you"
+	elif id(condition)==id(UnfixedWidget[-1].isgetmustart):
 		buttonhh=UnfixedWidget[-1].mustarthh
 		buttonmm=UnfixedWidget[-1].mustartmm
-	elif condition==UnfixedWidget[-1].isgetlowerbound:
-		print "am here"
+	elif id(condition)==id(UnfixedWidget[-1].isgetlowerbound):
 		buttonhh=UnfixedWidget[-1].lowerboundhh
 		buttonmm=UnfixedWidget[-1].lowerboundmm
-	elif condition==UnfixedWidget[-1].isgetupperbound:
-		print "am here"
+	elif id(condition)==id(UnfixedWidget[-1].isgetupperbound):
 		buttonhh=UnfixedWidget[-1].upperboundhh
 		buttonmm=UnfixedWidget[-1].upperboundmm
-	elif condition==UnfixedWidget[-1].isgetpriority:
-		print "am hereasd"
-		#buttonp==UnfixedWidget[-1].upperboundmm
-		buttonhh=UnfixedWidget[-1].priority
-		buttonmm=UnfixedWidget[-1].priority
 	if condition==True:
+
 		if event.type==pygame.KEYDOWN:
-			print "counter: ",counter
 			x=event.key
-			print chr(x)
+
 			if x>=48 and x<=57:
 				if counter<=3:
 					if counter==0:
@@ -59,6 +53,10 @@ def getinputothers(Object,counter,event,condition):
 					elif counter==1:
 						buttonhh.edit(chr(x),2)
 					elif counter==2:
+						buttonmm.highlight((71, 62, 63))
+						buttonmm.font_col=(242,242,242)
+						buttonhh.unhighlight((255,255,255))
+						buttonhh.font_col=(0,0,0)
 						buttonmm.edit(chr(x),0)	
 					elif counter==3:
 						buttonmm.edit(chr(x),2)
@@ -84,23 +82,47 @@ def getinputothers(Object,counter,event,condition):
 				if int(buttonmm.text[0]+buttonmm.text[2])>=60:
 					UnfixedWidget[-1].durationbuttonmm.text="5 9"	
 			elif condition==UnfixedWidget[-1].isgetmustart:
-				print buttonmm
 				if int(buttonhh.text[0]+buttonhh.text[2])>=24:
 					UnfixedWidget[-1].mustarthh.text="2 3"
 				if int(buttonmm.text[0]+buttonmm.text[2])>=60:
-					UnfixedWidget[-1].mustartmm.text="5 9"	
+					UnfixedWidget[-1].mustartmm.text="5 9"
 			elif condition==UnfixedWidget[-1].isgetlowerbound:
-				print buttonmm
 				if int(buttonhh.text[0]+buttonhh.text[2])>=24:
 					UnfixedWidget[-1].lowerboundhh.text="2 3"
 				if int(buttonmm.text[0]+buttonmm.text[2])>=60:
 					UnfixedWidget[-1].lowerboundmm.text="5 9"
 			elif condition==UnfixedWidget[-1].isgetupperbound:
-				print buttonmm
 				if int(buttonhh.text[0]+buttonhh.text[2])>=24:
 					UnfixedWidget[-1].upperboundhh.text="2 3"
 				if int(buttonmm.text[0]+buttonmm.text[2])>=60:
 					UnfixedWidget[-1].upperboundmm.text="5 9"
 
+
 	return UnfixedWidget,counter
 
+def getpriority(Object,counter,event,condition):
+	UnfixedWidget=Object
+	buttonp=UnfixedWidget[-1].priority
+
+	if condition==True:
+
+		if event.type==pygame.KEYDOWN:
+			x=event.key
+
+			if x>=48 and x<=57:
+				if counter<=3:
+					if counter==0:
+						buttonp.edit(chr(x),0)
+					elif counter==1:
+						buttonp.edit(chr(x),2)
+					counter+=1																
+			elif x==K_ESCAPE or x==K_RETURN:
+				UnfixedWidget[-1].isgetDuration=False
+				caps=False
+			elif x==K_BACKSPACE:
+				if counter==0:
+					buttonp.edit('0',0)
+				elif counter==1:
+					buttonp.edit('0',2)
+				counter-=1	
+	return UnfixedWidget,counter

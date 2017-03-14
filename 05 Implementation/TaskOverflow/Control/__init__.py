@@ -113,7 +113,7 @@ class Scheduler:
 		error=0		#this will be set to 1 if the new task can no longer be added to the current schedule
 		if(NT.tType==0):	#adding a fixed task
 			TB=self.CS.locateTB(NT.mStart)	
-			if(TB.isEnough(NT.duration)):
+			if(getDuration(NT.mStart,TB.etime)>=NT.duration):
 				if(not TB.isFree()):
 					if(TB.status.tType==0):
 						error+=1	#the timeslot is already taken by another fixed task
@@ -155,11 +155,13 @@ class Scheduler:
 				else:
 					slotFound = TB
 				slotFound.status=NT
+				self.displaySched()
 				self.message("The new task was successfully added!")
 				return 	
 
 			elif(NT.partition==1 and self.CS.canPartition(NT)):	
 				self.CS.partition(NT)
+				self.displaySched()
 				self.message("The new task was added by partitioning!")	
 				return 
 
@@ -176,7 +178,7 @@ class Scheduler:
 
 		if(len(self.CS.PQ)!=0):
 			self.reschedule()
-
+		self.displaySched()
 	def reschedule(self):
 		while (len(self.CS.PQ)!=0):
 			self.addTask(heapq.heappop(self.CS.PQ))	
@@ -243,3 +245,4 @@ class Scheduler:
 		Task.numberOfTasks = numberOfTasks    	
 		fob.close()
 		self.CS.sched = sched	
+		self.displaySched()

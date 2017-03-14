@@ -38,7 +38,5 @@ This software serves as the primary Class that integrates the modules.
 Software Project (Task OverFlow).
 
 '''
-from Control.__init__ import *
-
-TaskAllocator = Scheduler()
-TaskAllocator.menu()	
+from UI.__init__ import *
+mainUI()	

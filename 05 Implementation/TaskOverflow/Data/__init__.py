@@ -69,10 +69,7 @@ class Task:
 		self.mStart=mstart
 		self.mEnd=mend
 		self.partition=partition
-		if(priority==-1 and tType==1):		# A flexible task without a priority
-			self.priority=101
-		else:
-			self.priority=priority	
+		self.priority = priority
 
 	def __cmp__(self,other):				# this will be used by the methods of heapq defined in python
 		if(other!=None):
@@ -352,5 +349,4 @@ class Schedule:
 					slot = self.split(pointer,pointer.stime,NT.mEnd)
 				slot.status = NT
 				remaining=getDuration(slot.duration,remaining)
-		
 				
