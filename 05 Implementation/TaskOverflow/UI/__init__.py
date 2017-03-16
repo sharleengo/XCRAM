@@ -17,7 +17,7 @@ from Data.functions import *
 '''
 WIN_SIZE_X=700
 WIN_SIZE_Y=600
-BACKGROUND_COLOR=(5, 101, 113)
+BACGROUND_COLOR=(5, 101, 113)
 
 class mainUI():
 
@@ -29,8 +29,8 @@ class mainUI():
 		self.myMouse.set_cursor(*pygame.cursors. arrow)	
 
 		#initialize primary widgets
-		self.taskPaneHeader=Wid.TaskPaneHeader((100,50),(65,65,65),(500,50),"Time")
-		self.taskPane=Wid.TaskPane((100,50),(239,228,176),(500,500))
+		self.taskPaneHeader=Wid.TaskPaneHeader((100,50),(65, 65, 65),(500,50),"Time")
+		self.taskPane=Wid.TaskPane((100,50),(239, 228, 176),(500,500))
 		self.addButton=Wid.Button2("UI/res/icons/addButton.png",(625,50),(50,50))
 		self.clearButton=Wid.Button2("UI/res/icons/clearButton.png",(625,110),(50,50))
 		self.UnfixedWidget=[]
@@ -56,6 +56,7 @@ class mainUI():
 
 		self.blinkSwitch=0		
 		self.clearTask=False
+		self.deleteTask=False
 
 		#counter-> this variables is for getting input
 		self.getdurationcounter=0
@@ -127,15 +128,41 @@ class mainUI():
 										if self.UnfixedWidget==[]:
 											DI=Wid.DisplayInfo((WIN_SIZE_X/2-200,WIN_SIZE_Y/2-175),(108,206,203),(400,400),i)
 											self.UnfixedWidget.append(DI)
+											self.deleteTask=True
+						if self.deleteTask==True:
+							if util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].delete):
+								print "delete task"
+								self.TaskAllocator.deleteTask(self.UnfixedWidget[-1].TBUI.status.tid)
+								self.UnfixedWidget=[]
+								self.deleteTask=False
+							elif util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].cancel):
+								print "cancel task"
+								self.UnfixedWidget=[]
+								self.deleteTask=False
+
+								#self.addButton=Wid.Button2("UI/res/icons/addButton.png",(625,50),(50,50))
+
 
 					elif event.button == 4:  #scrolls up the timetable
-						print "scrolling upp"
-						self.positionreferencecounter+=.5
+						if(len(self.AllocationSpaceUI))>9:
+							print "scrolling upp"
+							self.positionreferencecounter+=.5
+							if self.positionreferencecounter<9-len(self.AllocationSpaceUI):
+								self.positionreferencecounter=9-len(self.AllocationSpaceUI)
+							elif self.positionreferencecounter>0:
+								self.positionreferencecounter=0
+
+
 
 				elif event.type==pygame.MOUSEBUTTONUP: #scrolls down the timetable
 					if event.button == 5:
-						print "scrolling down"	
-						self.positionreferencecounter-=.5
+						if len(self.AllocationSpaceUI)>9:
+							print "scrolling down"	
+							self.positionreferencecounter-=.5
+							if self.positionreferencecounter<9-len(self.AllocationSpaceUI):
+								self.positionreferencecounter=9-len(self.AllocationSpaceUI)
+							elif self.positionreferencecounter>0:
+								self.positionreferencecounter=0
 
 
 				#display the taskUI if addTask is True
@@ -173,10 +200,6 @@ class mainUI():
 				elif keys[pygame.K_PAGEDOWN]:
 					self.positionreferencecounter-=.5
 
-				if self.positionreferencecounter<9-len(self.AllocationSpaceUI):
-					self.positionreferencecounter=9-len(self.AllocationSpaceUI)
-				elif self.positionreferencecounter>0:
-					self.positionreferencecounter=0
 
 
 
@@ -188,10 +211,10 @@ class mainUI():
 		quit()
 
 	def ClickAddButton(self):
-		if self.addTask==False and self.clearTask==False:
+		if self.addTask==False and self.clearTask==False and self.deleteTask==False:
 			if util.isMouseover(self.myMouse.get_pos(),self.addButton):	
 				self.addButton=Wid.Button2("UI/res/icons/addButtonClicked.png",(625,50),(50,50))		
-				myAddTaskUI=Wid.AddTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(225,106,92))
+				myAddTaskUI=Wid.AddTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(108,206,203))
 				self.UnfixedWidget.append(myAddTaskUI)	
 				self.addTask=True
 				#reinitialize all addTask states to False
@@ -202,7 +225,7 @@ class mainUI():
 				self.addTask=False
 				#reinitialize all addTask states to False
 	def ClickClearButton(self):
-		if self.clearTask==False and self.addTask==False:
+		if self.clearTask==False and self.addTask==False and self.deleteTask==False:
 			if util.isMouseover(self.myMouse.get_pos(),self.clearButton):	
 				self.clearButton=Wid.Button2("UI/res/icons/clearButtonClicked.png",(625,110),(50,50))		
 				self.clearTask=True
@@ -217,8 +240,10 @@ class mainUI():
 
 	def ClickGetTask(self):
 		if util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].input):
+			self.UnfixedWidget[-1].input.outline=(0,0,0)			
 			return True
 		if not util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].input):
+			self.UnfixedWidget[-1].input.outline=(255,255,255)			
 			return False
 	def ClickGetType(self):
 		if self.UnfixedWidget[-1].fixrbut.gettasktype(self.myMouse.get_pos())=="fix":
@@ -377,15 +402,37 @@ class mainUI():
 				# Integration of Add Task
 				NT = Task()
 				NT=self.extractData(NT)
-				if( not NT.invalidArguments() ):
+				if( not NT.invalidArguments() ) and self.UnfixedWidget[-1].input.text!="    task: ":
 					self.TaskAllocator.addTask(NT)
+					self.UnfixedWidget=[]
+					self.addTask=False
+					getTask=False			
+					self.addButton=Wid.Button2("UI/res/icons/addButton.png",(625,50),(50,50))
 				else:
+					error=NT.invalidArguments()
+					self.UnfixedWidget[-1].durationbuttonhh.outlineColor=(0,0,0)
+					self.UnfixedWidget[-1].durationbuttonmm.outlineColor=(0,0,0)
+					self.UnfixedWidget[-1].lowerboundhh.outlineColor=(0,0,0)
+					self.UnfixedWidget[-1].lowerboundmm.outlineColor=(0,0,0)						
+					self.UnfixedWidget[-1].upperboundhh.outlineColor=(0,0,0)
+					self.UnfixedWidget[-1].upperboundmm.outlineColor=(0,0,0)
+					self.UnfixedWidget[-1].input.outline=(255,255,255)
+
+					if self.UnfixedWidget[-1].input.text=="    task: ":
+						self.UnfixedWidget[-1].input.outline=(255,0,0)
+
+					if error==1:
+						self.UnfixedWidget[-1].durationbuttonhh.outlineColor=(255,0,0)
+						self.UnfixedWidget[-1].durationbuttonmm.outlineColor=(255,0,0)
+					if error==2 or error==3:
+						self.UnfixedWidget[-1].lowerboundhh.outlineColor=(255,0,0)
+						self.UnfixedWidget[-1].lowerboundmm.outlineColor=(255,0,0)						
+						self.UnfixedWidget[-1].upperboundhh.outlineColor=(255,0,0)
+						self.UnfixedWidget[-1].upperboundmm.outlineColor=(255,0,0)						
+
 					print "Task not added. Invalid Argument(s)"
 
-				self.UnfixedWidget=[]
-				self.addTask=False
-				getTask=False			
-				self.addButton=Wid.Button2("UI/res/icons/addButton.png",(625,50),(50,50))
+
 				
 	def confirmedClear(self):
 		if self.clearTask==True:
@@ -439,7 +486,7 @@ class mainUI():
 
 
 	def drawUI(self,positionreferencecounter):
-		self.AppDisplay.fill(BACKGROUND_COLOR)
+		self.AppDisplay.fill(BACGROUND_COLOR)
 		#pygame.draw.rect(self.AppDisplay,BACGROUND_COLOR,(650,0,WIN_SIZE_X,WIN_SIZE_Y))
 		self.taskPane.draw(self.AppDisplay)
 		self.addButton.draw(self.AppDisplay)
@@ -466,7 +513,7 @@ class mainUI():
 		for i in self.UnfixedWidget:
 			i.draw(self.AppDisplay)
 
-		pygame.draw.rect(self.AppDisplay,BACKGROUND_COLOR,((0,550),(800,50)))	
-		pygame.draw.rect(self.AppDisplay,BACKGROUND_COLOR,((0,0),(800,50)))
+		pygame.draw.rect(self.AppDisplay,BACGROUND_COLOR,((0,550),(800,50)))	
+		pygame.draw.rect(self.AppDisplay,BACGROUND_COLOR,((0,0),(800,50)))
 		self.taskPaneHeader.draw(self.AppDisplay)
 		self.taskPaneHeader.addText("Task",(250,15),self.AppDisplay)
