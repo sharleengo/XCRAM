@@ -124,7 +124,9 @@ class mainUI():
 								if util.isMouseover(self.myMouse.get_pos(),i):
 									if i.status!=None:
 										print i.status.tid,"is pressed"
-
+										if self.UnfixedWidget==[]:
+											DI=Wid.DisplayInfo((WIN_SIZE_X/2-200,WIN_SIZE_Y/2-175),(108,206,203),(400,400),i)
+											self.UnfixedWidget.append(DI)
 
 					elif event.button == 4:  #scrolls up the timetable
 						print "scrolling upp"
