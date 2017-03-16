@@ -80,6 +80,17 @@ class Task:
 	def display(self):
 		print "title = ",self.title,"\ntype = ",self.type,"\nduration = ",self.duration,"\nstime = ",self.stime,"\netime = ",self.etime,"\npriority = ",self.priority,"\ntid=",self.tid,"\n"
 
+	def invalidArguments(self):
+		if(self.duration<=0):
+			print "Error 1: Duration must be greater than 0"
+			return 1
+		if(self.mStart>=self.mEnd):
+			print "Error 2: The lowerbound must be less than the upperbound"
+			return 2
+		if (self.tType ==1 and getDuration(self.mStart,self.mEnd)<self.duration):
+			print "Error 3: The given time window is too small to fit the flexible task"	
+			return 3
+		return 0	
 # TimeBlock class variables
 # stime: the start time of the TimeBlock
 # etime: the end time of the TimeBlock
