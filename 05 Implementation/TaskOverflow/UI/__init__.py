@@ -17,7 +17,7 @@ from Data.functions import *
 '''
 WIN_SIZE_X=700
 WIN_SIZE_Y=600
-BACGROUND_COLOR=(33, 140, 141)
+BACKGROUND_COLOR=(5, 101, 113)
 
 class mainUI():
 
@@ -29,8 +29,8 @@ class mainUI():
 		self.myMouse.set_cursor(*pygame.cursors. arrow)	
 
 		#initialize primary widgets
-		self.taskPaneHeader=Wid.TaskPaneHeader((100,50),(71, 62, 63),(500,50),"Time")
-		self.taskPane=Wid.TaskPane((100,50),(239, 113, 38),(500,500))
+		self.taskPaneHeader=Wid.TaskPaneHeader((100,50),(65,65,65),(500,50),"Time")
+		self.taskPane=Wid.TaskPane((100,50),(239,228,176),(500,500))
 		self.addButton=Wid.Button2("UI/res/icons/addButton.png",(625,50),(50,50))
 		self.clearButton=Wid.Button2("UI/res/icons/clearButton.png",(625,110),(50,50))
 		self.UnfixedWidget=[]
@@ -189,7 +189,7 @@ class mainUI():
 		if self.addTask==False and self.clearTask==False:
 			if util.isMouseover(self.myMouse.get_pos(),self.addButton):	
 				self.addButton=Wid.Button2("UI/res/icons/addButtonClicked.png",(625,50),(50,50))		
-				myAddTaskUI=Wid.AddTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(108,206,203))
+				myAddTaskUI=Wid.AddTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(225,106,92))
 				self.UnfixedWidget.append(myAddTaskUI)	
 				self.addTask=True
 				#reinitialize all addTask states to False
@@ -437,7 +437,7 @@ class mainUI():
 
 
 	def drawUI(self,positionreferencecounter):
-		self.AppDisplay.fill((108,206,203))
+		self.AppDisplay.fill(BACKGROUND_COLOR)
 		#pygame.draw.rect(self.AppDisplay,BACGROUND_COLOR,(650,0,WIN_SIZE_X,WIN_SIZE_Y))
 		self.taskPane.draw(self.AppDisplay)
 		self.addButton.draw(self.AppDisplay)
@@ -448,11 +448,11 @@ class mainUI():
 		#positionreferencecounter=0
 		X=self.TaskAllocator.CS.sched
 		while X!=None:
-			TBUI=Wid.TimeBlockUI((205,105+(49*positionreferencecounter)),(255,222,0),(390,50),X)
+			TBUI=Wid.TimeBlockUI((205,105+(49*positionreferencecounter)),(204,223,203),(390,50),X)
 			if TBUI.status==None:
-				TBUI.color=(239, 113, 38)
+				TBUI.color=(239, 228, 176)
 			elif TBUI.status.tType==1:
-				TBUI.color=(255,245,171)
+				TBUI.color=(255,106,92)
 			self.AllocationSpaceUI.append(TBUI)
 			positionreferencecounter+=1
 			X=X.next
@@ -464,7 +464,7 @@ class mainUI():
 		for i in self.UnfixedWidget:
 			i.draw(self.AppDisplay)
 
-		pygame.draw.rect(self.AppDisplay,(108,206,203),((0,550),(800,50)))	
-		pygame.draw.rect(self.AppDisplay,(108,206,203),((0,0),(800,50)))
+		pygame.draw.rect(self.AppDisplay,BACKGROUND_COLOR,((0,550),(800,50)))	
+		pygame.draw.rect(self.AppDisplay,BACKGROUND_COLOR,((0,0),(800,50)))
 		self.taskPaneHeader.draw(self.AppDisplay)
 		self.taskPaneHeader.addText("Task",(250,15),self.AppDisplay)
