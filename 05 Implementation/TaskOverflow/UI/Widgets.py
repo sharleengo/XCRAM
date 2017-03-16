@@ -11,10 +11,11 @@ class Button(pygame.Rect):
 		self.rect = pygame.Rect(position, dimension)
 		self.text=text
 		self.font_col=font_col
-		self.bold=bold		
+		self.bold=bold	
+		self.outlineColor=(0,0,0)
 
 	def draw(self,surface):
-		#pygame.draw.rect(surface,(0,0,0),(self.dimension[0]+2,self.dimension[1]+2,self.position[0]-1,self.position[1]-1))
+		pygame.draw.rect(surface,self.outlineColor,((self.position[0]-1,self.position[1]-1),(self.dimension[0]+2,self.dimension[1]+2)))
 
 		pygame.draw.rect(surface,self.color,self.rect)
 		self.font = pygame.font.SysFont('Helvetica', 18)
@@ -61,6 +62,8 @@ class TimeBlockUI(Button,TimeBlock):
 		#self.font.set_bold(self.bold)
 		
 		surface.blit(self.font.render(str(self.stime)+"-"+str(self.etime), True, (71, 62, 63)), (self.position[0]-95,self.position[1]+10))	
+		if self.status!=None:
+			surface.blit(self.font.render(self.status.title, True, (71, 62, 63)), (self.position[0]+30,self.position[1]+10))
 
 class MenuBar(pygame.Rect):
 	def __init__(self,position,color,dimension,text=None):
@@ -86,8 +89,7 @@ class TaskPaneHeader(MenuBar):
 		self.font = pygame.font.SysFont('Helvetica', 18)
 		self.font.set_bold(True)
 		surface.blit(self.font.render(text, True, (255,255,255)), (self.position[0]+position[0],self.position[1]+position[1]))
-		
-		
+
 class TaskPane(MenuBar):
 	def __init__(self,position,color,dimension,text=None):
 		MenuBar.__init__(self,position,color,dimension,text)
@@ -100,7 +102,7 @@ class MessageDialog(pygame.Rect):
 		self.rect = pygame.Rect(self.position, self.dimension)
 		self.query=query
 		self.cancel=Button((self.position[0]+self.dimension[0]-100,self.position[1]+110),(229,204,255),(75,25)," Cancel")
-		self.add=Button((self.position[0]+25,self.position[1]+110),(71, 62, 63),(75,25),"   Add",(20,20,20))
+		self.clear=Button((self.position[0]+25,self.position[1]+110),(71, 62, 63),(75,25),"   Clear",(20,20,20))
 	def draw(self,surface):
 		pygame.draw.rect(surface,(200,200,200),((self.position[0]-1	,self.position[1]-1),(self.dimension[0]+2,self.dimension[1]+2)))
 		pygame.draw.rect(surface,self.color,self.rect)
@@ -110,21 +112,53 @@ class MessageDialog(pygame.Rect):
 		if self.query!=None:	
 			surface.blit(self.font.render(self.query, True, (71, 62, 63)), (self.position[0]+40,self.position[1]+50))	
 		self.cancel.draw(surface)
-		self.add.draw(surface)
+		self.clear.draw(surface)
+
+class DisplayInfo(pygame.Rect):
+	def __init__(self,position,color,dimension,TBUI):
+		self.position=position
+		self.color=color
+		self.dimension=dimension
+		self.rect=pygame.Rect(self.position,self.dimension)
+		self.delete=Button((self.position[0]+20,self.position[1]+360),(229,204,255),(75,25)," Delete")
+		self.cancel=Button((self.position[0]+300,self.position[1]+360),(229,204,255),(75,25)," cancel")
+
+		self.TBUI=TBUI
+	def draw(self,surface):
+		pygame.draw.rect(surface,(200,200,200),((self.position[0]-1	,self.position[1]-1),(self.dimension[0]+2,self.dimension[1]+2)))
+		pygame.draw.rect(surface,self.color,self.rect)
+		self.font = pygame.font.SysFont('Helvetica', 18)
+
+		#draw info
+		surface.blit(self.font.render("TASK INFORMATION" , True, (71, 62, 63)), (self.position[0]+120,self.position[1]+30))
+		surface.blit(self.font.render("task id:     " + str(self.TBUI.status.tid), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+60))
+		surface.blit(self.font.render("task name:" + self.TBUI.status.title, True, (71, 62, 63)), (self.position[0]+40,self.position[1]+90))
+		surface.blit(self.font.render("task id:" + str(self.TBUI.status.tid), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+120))
+		surface.blit(self.font.render("task type:" + str(self.TBUI.status.tType), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+150))
+		surface.blit(self.font.render("task duration:" + str(self.TBUI.status.duration), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+180))
+
+
+		self.delete.draw(surface)
+		self.cancel.draw(surface)
 
 class Input(pygame.sprite.Sprite):
 	def __init__(self,position,dimension,text=None):
-		image="UI/Resources/inputimg2.png"
-		self.image=pygame.image.load(image).convert()
-		self.image.set_alpha(75)
+		#image="UI/Resources/inputimg2.png"
+		#self.image=pygame.image.load(image).convert()
+		#self.image.set_alpha(100)
 		self.position=position
 		self.dimension=dimension
+		self.rect=pygame.Rect(self.position,self.dimension)
 		self.text=text
-		self.image=pygame.transform.scale(self.image,self.dimension)
+		#self.image=pygame.transform.scale(self.image,self.dimension)
+		self.outline=(255,255,255)
+		self.color=(225,225,225)
 
 
 	def draw(self,surface):
-		surface.blit(self.image,self.position)	
+		pygame.draw.rect(surface,self.outline,((self.position[0]-1,self.position[1]-1),(self.dimension[0]+2,self.dimension[1]+2)))
+		pygame.draw.rect(surface,self.color,self.rect)
+		#surface.blit(self.image,self.position)	
 		self.font = pygame.font.SysFont('Helvetica', 18)
 		if self.text!=None:	
 			surface.blit(self.font.render(self.text, True, (0,0,0)), (self.position[0]+5,self.position[1]+5))	
