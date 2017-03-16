@@ -82,6 +82,12 @@ class MenuBar(pygame.Rect):
 class TaskPaneHeader(MenuBar):
 	def __init__(self,position,color,dimension,text=None):
 		MenuBar.__init__(self,position,color,dimension,text)
+	def addText(self,text,position,surface):
+		self.font = pygame.font.SysFont('Helvetica', 18)
+		self.font.set_bold(True)
+		surface.blit(self.font.render(text, True, (255,255,255)), (self.position[0]+position[0],self.position[1]+position[1]))
+		
+		
 class TaskPane(MenuBar):
 	def __init__(self,position,color,dimension,text=None):
 		MenuBar.__init__(self,position,color,dimension,text)
