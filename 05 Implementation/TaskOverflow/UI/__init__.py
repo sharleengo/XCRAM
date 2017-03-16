@@ -375,7 +375,10 @@ class mainUI():
 				# Integration of Add Task
 				NT = Task()
 				NT=self.extractData(NT)
-				self.TaskAllocator.addTask(NT)
+				if( not NT.invalidArguments() ):
+					self.TaskAllocator.addTask(NT)
+				else:
+					print "Task not added. Invalid Argument(s)"
 
 				self.UnfixedWidget=[]
 				self.addTask=False
