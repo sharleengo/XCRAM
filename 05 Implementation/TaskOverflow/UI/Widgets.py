@@ -101,8 +101,8 @@ class MessageDialog(pygame.Rect):
 		self.dimension=dimension
 		self.rect = pygame.Rect(self.position, self.dimension)
 		self.query=query
-		self.cancel=Button((self.position[0]+self.dimension[0]-100,self.position[1]+110),(229,204,255),(75,25)," Cancel")
-		self.clear=Button((self.position[0]+25,self.position[1]+110),(71, 62, 63),(75,25),"   Clear",(20,20,20))
+		self.cancel=Button((self.position[0]+self.dimension[0]-100,self.position[1]+110),(255,255,255),(75,25)," Cancel")
+		self.clear=Button((self.position[0]+25,self.position[1]+110),(255, 255, 255),(75,25),"   Clear",(20,20,20))
 	def draw(self,surface):
 		pygame.draw.rect(surface,(200,200,200),((self.position[0]-1	,self.position[1]-1),(self.dimension[0]+2,self.dimension[1]+2)))
 		pygame.draw.rect(surface,self.color,self.rect)
@@ -120,26 +120,36 @@ class DisplayInfo(pygame.Rect):
 		self.color=color
 		self.dimension=dimension
 		self.rect=pygame.Rect(self.position,self.dimension)
-		self.delete=Button((self.position[0]+20,self.position[1]+360),(229,204,255),(75,25)," Delete")
-		self.cancel=Button((self.position[0]+300,self.position[1]+360),(229,204,255),(75,25)," cancel")
+		self.delete=Button((self.position[0]+20,self.position[1]+360),(255,255,255),(75,25)," Delete",(20,20,20))
+		self.edit=Button((self.position[0]+160,self.position[1]+360),(255,255,255),(75,25)," Edit",(20,20,20))		
+		self.cancel=Button((self.position[0]+300,self.position[1]+360),(255,255,255),(75,25)," cancel")
 
 		self.TBUI=TBUI
 	def draw(self,surface):
-		pygame.draw.rect(surface,(200,200,200),((self.position[0]-1	,self.position[1]-1),(self.dimension[0]+2,self.dimension[1]+2)))
+		pygame.draw.rect(surface,(0,0,0),((self.position[0]-1	,self.position[1]-1),(self.dimension[0]+2,self.dimension[1]+2)))
 		pygame.draw.rect(surface,self.color,self.rect)
 		self.font = pygame.font.SysFont('Helvetica', 18)
 
 		#draw info
 		surface.blit(self.font.render("TASK INFORMATION" , True, (71, 62, 63)), (self.position[0]+120,self.position[1]+30))
-		surface.blit(self.font.render("task id:     " + str(self.TBUI.status.tid), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+60))
-		surface.blit(self.font.render("task name:" + self.TBUI.status.title, True, (71, 62, 63)), (self.position[0]+40,self.position[1]+90))
-		surface.blit(self.font.render("task id:" + str(self.TBUI.status.tid), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+120))
-		surface.blit(self.font.render("task type:" + str(self.TBUI.status.tType), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+150))
-		surface.blit(self.font.render("task duration:" + str(self.TBUI.status.duration), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+180))
+		surface.blit(self.font.render("task id:                  " + str(self.TBUI.status.tid), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+60))
+		surface.blit(self.font.render("task name:            " + self.TBUI.status.title, True, (71, 62, 63)), (self.position[0]+40,self.position[1]+90))
+		#surface.blit(self.font.render("task id:                  " + str(self.TBUI.status.tid), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+120))
+		surface.blit(self.font.render("task type:                 " + str(self.TBUI.status.tType), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+150))
+		surface.blit(self.font.render("task duration:          " + str(self.TBUI.status.duration), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+180))
+		if self.TBUI.status.tType==0:
+			surface.blit(self.font.render("task must start at :   " + str(self.TBUI.status.mStart), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+210))	
+			surface.blit(self.font.render("task must end at :    " + str(self.TBUI.status.mEnd), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+240))	
 
-
+		if self.TBUI.status.tType==1:
+			surface.blit(self.font.render("task must start as early as  :   " + str(self.TBUI.status.mStart), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+210))	
+			surface.blit(self.font.render("task must end as late as :       " + str(self.TBUI.status.mEnd), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+240))	
+			surface.blit(self.font.render("partition:                                  " + str(self.TBUI.status.partition), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+270))	
+			surface.blit(self.font.render("priority:                                    " + str(self.TBUI.status.priority), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+300))	 
+ 
 		self.delete.draw(surface)
 		self.cancel.draw(surface)
+		self.edit.draw(surface)
 
 class Input(pygame.sprite.Sprite):
 	def __init__(self,position,dimension,text=None):
@@ -248,8 +258,8 @@ class AddTaskUI(pygame.Rect):
 
 		self.durationbuttonhh=Button((self.position[0]+90,self.position[1]+60),(255,255,255),(35,30),"0 0")
 		self.durationbuttonmm=Button((self.position[0]+130,self.position[1]+60),(255,255,255),(35,30),"0 0")
-		self.cancel=Button((self.position[0]+300,self.position[1]+300),(229,204,255),(75,25)," Cancel")
-		self.add=Button((self.position[0]+75,self.position[1]+300),(71, 62, 63),(75,25),"   Add",(20,20,20))		
+		self.cancel=Button((self.position[0]+300,self.position[1]+300),(255,255,255),(75,25)," Cancel")
+		self.add=Button((self.position[0]+75,self.position[1]+300),(255,255,255),(75,25),"   Add",(20,20,20))		
 
 		self.fixrbut=RadioButton((self.position[0]+110,self.position[1]+120),(71, 62, 63),10,"fix")
 
@@ -269,22 +279,37 @@ class AddTaskUI(pygame.Rect):
 
 
 	def backspace(self):
-		if len(self.input.text)>9:
+		if len(self.input.text)>10:
 			self.input.text = self.input.text[:-1]
 
-	def extractData(self,TBUI):
+	def extractData(self,TBUI_status):
 		self.isgetDuration=False
 		self.isgetmustart=False
 		self.isgetlowerbound=False
 		self.isgetupperbound=False
 		self.isgetpriority=False
 
-		self.input.text+=TBUI.title
+		self.input.text+=TBUI_status.title
 
-		self.durationbuttonhh.text=str(TBUI.duration/1000)+' '+str((TBUI.duration%1000)/100)
-		self.durationbuttonmm.text=str((TBUI.duration%100)/10)+' '+str((TBUI.duration%10))
-		self.mustarthh.text=str(TBUI.mustart/1000)+' '+str((TBUI.mustart%1000)/100)
-		self.mustartmm.text=str((TBUI.mustart%100)/10)+' '+str((TBUI.mustart%10))
+		self.durationbuttonhh.text=str(TBUI_status.duration/1000)+' '+str((TBUI_status.duration%1000)/100)
+		self.durationbuttonmm.text=str((TBUI_status.duration%100)/10)+' '+str((TBUI_status.duration%10))
+
+		print self.TBUI.status.tType
+		if self.TBUI.status.tType==0:
+			self.fixrbut.type="fix"
+			self.mustarthh.text=str(TBUI_status.mStart/1000)+' '+str((TBUI_status.mStart%1000)/100)
+			self.mustartmm.text=str((TBUI_status.mStart%100)/10)+' '+str((TBUI_status.mStart%10))
+
+		else:
+			self.fixrbut.type="flexible"			
+			self.lowerboundhh.text=str(TBUI_status.mStart/1000)+' '+str((TBUI_status.mStart%1000)/100)
+			self.lowerboundmm.text=str((TBUI_status.mStart%100)/10)+' '+str((TBUI_status.mStart%10))
+			self.upperboundhh.text=str(TBUI_status.mEnd/1000)+' '+str((TBUI_status.mEnd%1000)/100)
+			self.upperboundmm.text=str((TBUI_status.mEnd%100)/10)+' '+str((TBUI_status.mEnd%10))
+
+
+
+
 
 	def draw(self,surface):
 		#self.rect = pygame.Rect(self.position, self.dimension)
@@ -322,3 +347,13 @@ class AddTaskUI(pygame.Rect):
 			self.mydr3.draw(surface)
 			self.mydr4.draw(surface)
 		'''
+
+
+
+class editTaskUI(AddTaskUI):
+	def __init__(self,position,dimenstion,color,TBUI):
+		AddTaskUI.__init__(self,position,dimenstion,color)
+		self.TBUI=TBUI
+		self.extractData(self.TBUI.status)
+		self.add.text="    edit"
+
