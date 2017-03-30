@@ -3,6 +3,7 @@
 import necesarry libraries from pygame and external modules Widgets and utilitFunctions
 '''
 import pygame, pygame.font, pygame.event, pygame.draw, string
+import pygame.gfxdraw
 from pygame.locals import *
 import Widgets as Wid
 import utilityFunctions as util
@@ -17,6 +18,7 @@ from Data.functions import *
 '''
 WIN_SIZE_X=700
 WIN_SIZE_Y=600
+BACGROUND_COLOR=(255,255,255)
 BACGROUND_COLOR=(5, 101, 113)
 
 class mainUI():
@@ -27,6 +29,8 @@ class mainUI():
 		self.AppDisplay=pygame.display.set_mode((WIN_SIZE_X,WIN_SIZE_Y)) 	
 		self.myMouse=pygame.mouse 
 		self.myMouse.set_cursor(*pygame.cursors. arrow)	
+		pygame.key.set_repeat(10,10) #enble
+
 
 		#initialize primary widgets
 		self.taskPaneHeader=Wid.TaskPaneHeader((100,50),(65, 65, 65),(500,50),"Time")
@@ -57,6 +61,7 @@ class mainUI():
 		self.blinkSwitch=0		
 		self.clearTask=False
 		self.deleteTask=False
+		self.editTask=False
 
 		#counter-> this variables is for getting input
 		self.getdurationcounter=0
@@ -80,7 +85,7 @@ class mainUI():
 					#change mouse pointer when over a addButton
 					#if util.isMouseover(self.myMouse.get_pos(),self.addButton): 
 					#	self.myMouse.set_cursor(*pygame.cursors.broken_x)	
-					#if not util.isMouseover(self.myMouse.get_pos(),self.addButton): 
+					#if not util.isMouseover(self.myMouse.get_pos(),self.addButton): 	
 					#	self.myMouse.set_cursor(*pygame.cursors.arrow)
 					pass
 
@@ -88,7 +93,7 @@ class mainUI():
 					if self.myMouse.get_pressed()==(1,0,0):
 						self.ClickAddButton()	#check if addBUtton is clicked, display addTaskUI if such event happens
 						self.ClickClearButton()	#check if ClearButton is Cliked, display a query message if user wants to delete all tasks
-						if self.addTask==True:
+						if self.addTask==True or self.editTask==True:
 							self.getTask=self.ClickGetTask()	#respomsibe for getting the title
 							self.ClickGetType() 				#reponsible for getting the type
 
@@ -115,12 +120,13 @@ class mainUI():
 
 							self.cancelAdd()
 							self.confirmAdd()
+							self.confirmEdit()
 
 						if self.clearTask==True:
 							self.confirmedClear()
 							self.cancelClear()
 
-						if self.addTask==False or self.clearTask==False:
+						if self.addTask==False or self.clearTask==False and self.deleteTask==False:
 							for i in self.AllocationSpaceUI:
 								if util.isMouseover(self.myMouse.get_pos(),i):
 									if i.status!=None:
@@ -129,6 +135,7 @@ class mainUI():
 											DI=Wid.DisplayInfo((WIN_SIZE_X/2-200,WIN_SIZE_Y/2-175),(108,206,203),(400,400),i)
 											self.UnfixedWidget.append(DI)
 											self.deleteTask=True
+
 						if self.deleteTask==True:
 							if util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].delete):
 								print "delete task"
@@ -139,6 +146,17 @@ class mainUI():
 								print "cancel task"
 								self.UnfixedWidget=[]
 								self.deleteTask=False
+
+							elif util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].edit):
+								print "edit task"
+								self.editTask=True
+								myEditTaskUI=Wid.editTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(108,206,203),self.UnfixedWidget[-1].TBUI) #initialize editTasUI 
+								self.UnfixedWidget=[]
+								self.UnfixedWidget.append(myEditTaskUI)
+								self.deleteTask=False
+								self.addTask=False
+								self.clearTask=False
+
 
 								#self.addButton=Wid.Button2("UI/res/icons/addButton.png",(625,50),(50,50))
 
@@ -166,7 +184,7 @@ class mainUI():
 
 
 				#display the taskUI if addTask is True
-				if self.addTask==True:
+				if self.addTask==True or self.editTask==True:
 					if self.getTask==True:
 						self.GetTaskTitle(event)
 
@@ -213,10 +231,14 @@ class mainUI():
 	def ClickAddButton(self):
 		if self.addTask==False and self.clearTask==False and self.deleteTask==False:
 			if util.isMouseover(self.myMouse.get_pos(),self.addButton):	
-				self.addButton=Wid.Button2("UI/res/icons/addButtonClicked.png",(625,50),(50,50))		
+				self.addButton=Wid.Button2("UI/res/icons/addButtonClicked.png",(625,50),(50,50))
+				self.UnfixedWidget=[]		
 				myAddTaskUI=Wid.AddTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(108,206,203))
 				self.UnfixedWidget.append(myAddTaskUI)	
 				self.addTask=True
+				self.clearTask=False
+				self.deleteTask=False
+				self.editTask=False				
 				#reinitialize all addTask states to False
 		elif self.addTask==True:
 			if util.isMouseover(self.myMouse.get_pos(),self.addButton):	
@@ -246,31 +268,39 @@ class mainUI():
 			self.UnfixedWidget[-1].input.outline=(255,255,255)			
 			return False
 	def ClickGetType(self):
-		if self.UnfixedWidget[-1].fixrbut.gettasktype(self.myMouse.get_pos())=="fix":
-			self.UnfixedWidget[-1].fixrbut.type="fix"
-			self.UnfixedWidget[-1].lowerboundhh.text="0 0"
-			self.UnfixedWidget[-1].lowerboundmm.text="0 0"
-			self.UnfixedWidget[-1].upperboundhh.text="0 0"
-			self.UnfixedWidget[-1].upperboundmm.text="0 0"
-			self.UnfixedWidget[-1].lowerboundhh.font_col=(200,200,200)
-			self.UnfixedWidget[-1].lowerboundmm.font_col=(200,200,200)
-			self.UnfixedWidget[-1].upperboundhh.font_col=(200,200,200)
-			self.UnfixedWidget[-1].upperboundmm.font_col=(200,200,200)
-			self.UnfixedWidget[-1].priority.font_col=(200,200,200)
-			self.UnfixedWidget[-1].lowerboundhh.color=(255,255,255)
-			self.UnfixedWidget[-1].lowerboundmm.color=(255,255,255)
-			self.UnfixedWidget[-1].upperboundhh.color=(255,255,255)
-			self.UnfixedWidget[-1].upperboundmm.color=(255,255,255)
-			self.UnfixedWidget[-1].priority.color=(255,255,255)
+		if self.addTask==True:
+			if self.UnfixedWidget[-1].fixrbut.gettasktype(self.myMouse.get_pos())=="fix":
+				self.UnfixedWidget[-1].fixrbut.type="fix"
+				self.UnfixedWidget[-1].lowerboundhh.text="0 0"
+				self.UnfixedWidget[-1].lowerboundmm.text="0 0"
+				self.UnfixedWidget[-1].upperboundhh.text="0 0"
+				self.UnfixedWidget[-1].upperboundmm.text="0 0"
+				self.UnfixedWidget[-1].lowerboundhh.font_col=(200,200,200)
+				self.UnfixedWidget[-1].lowerboundmm.font_col=(200,200,200)
+				self.UnfixedWidget[-1].upperboundhh.font_col=(200,200,200)
+				self.UnfixedWidget[-1].upperboundmm.font_col=(200,200,200)
+				self.UnfixedWidget[-1].priority.font_col=(200,200,200)
+				self.UnfixedWidget[-1].lowerboundhh.color=(255,255,255)
+				self.UnfixedWidget[-1].lowerboundmm.color=(255,255,255)
+				self.UnfixedWidget[-1].upperboundhh.color=(255,255,255)
+				self.UnfixedWidget[-1].upperboundmm.color=(255,255,255)
+				self.UnfixedWidget[-1].priority.color=(255,255,255)
 
-		if self.UnfixedWidget[-1].fixrbut.gettasktype(self.myMouse.get_pos())=="flexible":
-			self.UnfixedWidget[-1].fixrbut.type="flexible"
-			self.UnfixedWidget[-1].mustarthh.text="0 0"
-			self.UnfixedWidget[-1].mustartmm.text="0 0"	
-			self.UnfixedWidget[-1].mustarthh.font_col=(200,200,200)
-			self.UnfixedWidget[-1].mustartmm.font_col=(200,200,200)	
-			self.UnfixedWidget[-1].mustarthh.color=(255,255,255)
-			self.UnfixedWidget[-1].mustartmm.color=(255,255,255)	
+			if self.UnfixedWidget[-1].fixrbut.gettasktype(self.myMouse.get_pos())=="flexible":
+				self.UnfixedWidget[-1].fixrbut.type="flexible"
+				self.UnfixedWidget[-1].mustarthh.text="0 0"
+				self.UnfixedWidget[-1].mustartmm.text="0 0"	
+				self.UnfixedWidget[-1].mustarthh.font_col=(200,200,200)
+				self.UnfixedWidget[-1].mustartmm.font_col=(200,200,200)	
+				self.UnfixedWidget[-1].mustarthh.color=(255,255,255)
+				self.UnfixedWidget[-1].mustartmm.color=(255,255,255)
+		elif self.editTask==True:
+			if self.UnfixedWidget[-1].fixrbut.gettasktype(self.myMouse.get_pos())=="fix":
+				self.UnfixedWidget[-1].fixrbut.type="fix"
+
+			if self.UnfixedWidget[-1].fixrbut.gettasktype(self.myMouse.get_pos())=="flexible":
+				self.UnfixedWidget[-1].fixrbut.type="flexible"
+
 	def ClickGetTime(self,buttonhh,buttonmm):
 
 		if util.isMouseover(self.myMouse.get_pos(),buttonhh):			
@@ -379,13 +409,15 @@ class mainUI():
 	#def updateTime(self,condition)
 	def cancelAdd(self):
 		#cancel
-		if self.addTask==True:
+		if self.addTask==True or self.editTask==True:
 			if util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].cancel):
 				print "cancel"
 				self.UnfixedWidget=[]
 				self.addTask=False
+				self.editTask=False
 				getTask=False
 				self.addButton=Wid.Button2("UI/res/icons/addButton.png",(625,50),(50,50))
+
 
 	def cancelClear(self):
 		if self.clearTask==True:
@@ -394,6 +426,8 @@ class mainUI():
 				self.UnfixedWidget=[]
 				self.clearTask=False
 				self.clearButton=Wid.Button2("UI/res/icons/clearButton.png",(625,110),(50,50))
+
+
 	def confirmAdd(self):
 		#add
 		if self.addTask==True:
@@ -433,7 +467,20 @@ class mainUI():
 					print "Task not added. Invalid Argument(s)"
 
 
-				
+	
+	def confirmEdit(self):
+		if self.editTask==True:
+			if util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].add):
+				self.UnfixedWidget=[]
+				self.editTask=False
+				print "performing edit"
+
+				'''
+					Sharleen dito mo ilalagay yung function mo sa edit
+					if id yung reference mo sa edit, para maaccess mo yun->self.UnfixedWidget[-1].TBUI.status.tid
+					gamitin mo yung extractData na function dito, if necessary
+				'''
+
 	def confirmedClear(self):
 		if self.clearTask==True:
 			if util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].clear):
