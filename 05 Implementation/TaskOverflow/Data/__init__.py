@@ -78,7 +78,7 @@ class Task:
 			return 1	
 
 	def display(self):
-		print "title = ",self.title,"\ntype = ",self.type,"\nduration = ",self.duration,"\nstime = ",self.stime,"\netime = ",self.etime,"\npriority = ",self.priority,"\ntid=",self.tid,"\n"
+		print "title = ",self.title,"\ntype = ",self.tType,"\nduration = ",self.duration,"\nstime = ",self.mStart,"\netime = ",self.mEnd,"\npriority = ",self.priority,"\ntid=",self.tid,"\n"
 
 	def invalidArguments(self):
 		if(self.duration<=0):

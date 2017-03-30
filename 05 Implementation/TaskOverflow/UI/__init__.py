@@ -471,9 +471,40 @@ class mainUI():
 	def confirmEdit(self):
 		if self.editTask==True:
 			if util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].add):
-				self.UnfixedWidget=[]
-				self.editTask=False
 				print "performing edit"
+
+				NT = Task()
+				NT=self.extractData(NT)
+				if( not NT.invalidArguments() ) and self.UnfixedWidget[-1].input.text!="    task: ":
+					self.TaskAllocator.editTask(NT, self.UnfixedWidget[-1].TBUI.status.tid)
+					self.UnfixedWidget=[]
+					self.editTask=False
+					getTask=False			
+					self.addButton=Wid.Button2("UI/res/icons/addButton.png",(625,50),(50,50))
+				else:
+					error=NT.invalidArguments()
+					self.UnfixedWidget[-1].durationbuttonhh.outlineColor=(0,0,0)
+					self.UnfixedWidget[-1].durationbuttonmm.outlineColor=(0,0,0)
+					self.UnfixedWidget[-1].lowerboundhh.outlineColor=(0,0,0)
+					self.UnfixedWidget[-1].lowerboundmm.outlineColor=(0,0,0)						
+					self.UnfixedWidget[-1].upperboundhh.outlineColor=(0,0,0)
+					self.UnfixedWidget[-1].upperboundmm.outlineColor=(0,0,0)
+					self.UnfixedWidget[-1].input.outline=(255,255,255)
+
+					if self.UnfixedWidget[-1].input.text=="    task: ":
+						self.UnfixedWidget[-1].input.outline=(255,0,0)
+
+					if error==1:
+						self.UnfixedWidget[-1].durationbuttonhh.outlineColor=(255,0,0)
+						self.UnfixedWidget[-1].durationbuttonmm.outlineColor=(255,0,0)
+					if error==2 or error==3:
+						self.UnfixedWidget[-1].lowerboundhh.outlineColor=(255,0,0)
+						self.UnfixedWidget[-1].lowerboundmm.outlineColor=(255,0,0)						
+						self.UnfixedWidget[-1].upperboundhh.outlineColor=(255,0,0)
+						self.UnfixedWidget[-1].upperboundmm.outlineColor=(255,0,0)						
+
+					print "Task not edited. Invalid Argument(s)"
+
 
 				'''
 					Sharleen dito mo ilalagay yung function mo sa edit

@@ -28,7 +28,7 @@ of the Department of Computer Science, College of Engineering,
 University of the Philippines, Diliman for the AY 2016-2017
 
 Sharleen Go
-last updated on Febuary 17,2017
+last updated on March 16,2017
 Initial Software for Control Classes , its structures and methods.
 
 File created on Febuary 11, 2017.
@@ -61,7 +61,7 @@ class Scheduler:
 		while (True):
 			print "priority queue: ",self.CS.PQ,"\n"
 			self.displaySched()
-			response = raw_input("[A]Add task     [C]Clear Schedule     [D]Delete Task     [Q]Quit\n ")
+			response = raw_input("[A]Add task     [C]Clear Schedule     [D]Delete Task     [E]Edit Task 	[Q]Quit\n ")
 			print "\n"
 			if(response.lower() == 'q' ):
 				self.saveSched()
@@ -97,7 +97,13 @@ class Scheduler:
 				response = raw_input("Enter the id of the task to be deleted (C to cancel) : \n ")	
 				if(response.lower()!='c'):
 					self.deleteTask(int(response))
-					
+			
+			elif (response.lower() == 'e'):
+				self.CS.displaytasksList()
+				response = raw_input("Enter the id of the task to be edited (C to cancel) : \n ")	
+				if(response.lower()!='c'):
+					self.editTask(int(response))
+
 
 				# Insert code for delete task
 			else:
@@ -188,6 +194,31 @@ class Scheduler:
 		tasktodelete.append(tid)
 		self.CS.Kick(tasktodelete)
 		self.CS.PQ=[]
+
+	def editTask(self,NT,tid):
+		pointer = self.CS.sched
+		while (pointer!=None):
+			if(pointer.status!=None and pointer.status.tid == tid):
+				break
+			pointer = pointer.next
+
+		editThis = pointer.status
+		editThis.display()	
+		
+		mustReschedule = False
+		if(NT.duration!=editThis.duration or NT.mStart!=editThis.mStart or editThis.mEnd!=NT.mEnd or NT.partition<editThis.partition):
+			mustReschedule = True
+
+		if(mustReschedule):
+			self.deleteTask(tid)
+			self.addTask(NT)
+		else:
+			pointer.status = NT
+			while(pointer!=None):
+				if(pointer.status!=None and pointer.status.tid == tid):
+					pointer.status = NT
+				pointer = pointer.next	
+
 
 	def clearSched(self):
 		self.CS.clear()	
