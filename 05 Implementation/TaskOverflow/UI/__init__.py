@@ -18,8 +18,7 @@ from Data.functions import *
 '''
 WIN_SIZE_X=700
 WIN_SIZE_Y=600
-BACGROUND_COLOR=(255,255,255)
-BACGROUND_COLOR=(5, 101, 113)
+BACGROUND_COLOR=(108,100,139)
 
 class mainUI():
 
@@ -29,12 +28,12 @@ class mainUI():
 		self.AppDisplay=pygame.display.set_mode((WIN_SIZE_X,WIN_SIZE_Y)) 	
 		self.myMouse=pygame.mouse 
 		self.myMouse.set_cursor(*pygame.cursors. arrow)	
-		pygame.key.set_repeat(10,10) #enble
+		#pygame.key.set_repeat(10,10) #enble
 
 
 		#initialize primary widgets
-		self.taskPaneHeader=Wid.TaskPaneHeader((100,50),(65, 65, 65),(500,50),"Time")
-		self.taskPane=Wid.TaskPane((100,50),(239, 228, 176),(500,500))
+		self.taskPaneHeader=Wid.TaskPaneHeader((100,50),(26,41,48),(500,50),"Time")
+		self.taskPane=Wid.TaskPane((100,50),(220,199,170),(500,500))
 		self.addButton=Wid.Button2("UI/res/icons/addButton.png",(625,50),(50,50))
 		self.clearButton=Wid.Button2("UI/res/icons/clearButton.png",(625,110),(50,50))
 		self.UnfixedWidget=[]
@@ -132,7 +131,7 @@ class mainUI():
 									if i.status!=None:
 										print i.status.tid,"is pressed"
 										if self.UnfixedWidget==[]:
-											DI=Wid.DisplayInfo((WIN_SIZE_X/2-200,WIN_SIZE_Y/2-175),(108,206,203),(400,400),i)
+											DI=Wid.DisplayInfo((WIN_SIZE_X/2-200,WIN_SIZE_Y/2-175),(182,161,158),(400,400),i)
 											self.UnfixedWidget.append(DI)
 											self.deleteTask=True
 
@@ -150,7 +149,7 @@ class mainUI():
 							elif util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].edit):
 								print "edit task"
 								self.editTask=True
-								myEditTaskUI=Wid.editTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(108,206,203),self.UnfixedWidget[-1].TBUI) #initialize editTasUI 
+								myEditTaskUI=Wid.editTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(182,161,158),self.UnfixedWidget[-1].TBUI) #initialize editTasUI 
 								self.UnfixedWidget=[]
 								self.UnfixedWidget.append(myEditTaskUI)
 								self.deleteTask=False
@@ -233,7 +232,7 @@ class mainUI():
 			if util.isMouseover(self.myMouse.get_pos(),self.addButton):	
 				self.addButton=Wid.Button2("UI/res/icons/addButtonClicked.png",(625,50),(50,50))
 				self.UnfixedWidget=[]		
-				myAddTaskUI=Wid.AddTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(108,206,203))
+				myAddTaskUI=Wid.AddTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(182,161,158))
 				self.UnfixedWidget.append(myAddTaskUI)	
 				self.addTask=True
 				self.clearTask=False
@@ -251,7 +250,7 @@ class mainUI():
 			if util.isMouseover(self.myMouse.get_pos(),self.clearButton):	
 				self.clearButton=Wid.Button2("UI/res/icons/clearButtonClicked.png",(625,110),(50,50))		
 				self.clearTask=True
-				myMessageUI=Wid.MessageDialog((WIN_SIZE_X/2-150,WIN_SIZE_Y/2-175),(108,206,203),(300,150),"Would you like to Clear all Task?")
+				myMessageUI=Wid.MessageDialog((WIN_SIZE_X/2-150,WIN_SIZE_Y/2-175),(182,161,158),(300,150),"Would you like to Clear all Task?")
 				self.UnfixedWidget.append(myMessageUI)
 		elif self.clearTask==True:
 			if util.isMouseover(self.myMouse.get_pos(),self.clearButton):	
@@ -575,11 +574,11 @@ class mainUI():
 		#positionreferencecounter=0
 		X=self.TaskAllocator.CS.sched
 		while X!=None:
-			TBUI=Wid.TimeBlockUI((205,105+(49*positionreferencecounter)),(204,223,203),(390,50),X)
+			TBUI=Wid.TimeBlockUI((205,105+(49*positionreferencecounter)),(107,186,167),(390,50),X)
 			if TBUI.status==None:
-				TBUI.color=(239, 228, 176)
+				TBUI.color=(220,199,170)
 			elif TBUI.status.tType==1:
-				TBUI.color=(255,106,92)
+				TBUI.color=(251,161,0)
 			self.AllocationSpaceUI.append(TBUI)
 			positionreferencecounter+=1
 			X=X.next
