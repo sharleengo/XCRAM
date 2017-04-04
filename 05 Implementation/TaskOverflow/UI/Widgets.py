@@ -306,7 +306,8 @@ class AddTaskUI(pygame.Rect):
 			self.lowerboundmm.text=str((TBUI_status.mStart%100)/10)+' '+str((TBUI_status.mStart%10))
 			self.upperboundhh.text=str(TBUI_status.mEnd/1000)+' '+str((TBUI_status.mEnd%1000)/100)
 			self.upperboundmm.text=str((TBUI_status.mEnd%100)/10)+' '+str((TBUI_status.mEnd%10))
-
+			self.priority.text=str((TBUI_status.priority%100)/10)+' '+str((TBUI_status.priority%10))
+			self.partition.value=bool(TBUI_status.partition)
 
 
 
