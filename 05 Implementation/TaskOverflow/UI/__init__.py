@@ -1,3 +1,45 @@
+'''
+MIT License
+
+Copyright (c) 2017 Gerry Agluba.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+
+This is a course requirement for CS192 Software Engineering II
+under the supervision of Asst. Prof. Ma.Rowena C. Solamo 
+of the Department of Computer Science, College of Engineering,
+University of the Philippines, Diliman for the AY 2016-2017
+
+Gerry Agluba
+last updated on March 16,2017
+Initial Software for Control Classes , its structures and methods.
+
+File created on Febuary 20, 2017.
+Developed by TaskOverflow group.
+
+This software serves as the primary Control Classes  of our 
+Software Project (Task OverFlow).
+
+'''
+
+
 
 '''
 import necesarry libraries from pygame and external modules Widgets and utilitFunctions
@@ -9,6 +51,7 @@ import Widgets as Wid
 import utilityFunctions as util
 from Control.__init__ import *
 from Data.functions import *
+from collections import deque
 #from TaskOverflow.Data.__init__ import*
 
 #import get_input
@@ -106,9 +149,13 @@ class mainUI():
 									self.addState=3
 								elif self.ClickGetTime(self.UnfixedWidget[-1].upperboundhh,self.UnfixedWidget[-1].upperboundmm)==True:
 									self.addState=4	
-								elif self.clickGetPriority():
-									print "getting priority"
-									self.addState=5
+								elif self.clickDefaultPriority():
+									print "setting priority"
+								elif self.UnfixedWidget[-1].defaultPriority.value==True:
+									if self.clickGetPriority():
+										print "getting priority"
+										self.addState=5
+
 								self.clickGetPartition()
 								#if self.ClickGetTime(self.UnfixedWidget[-1].lowerboundhh,self.UnfixedWidget[-1].lowerboundmm)==True:
 								#	self.addState=3							
@@ -266,6 +313,7 @@ class mainUI():
 		if not util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].input):
 			self.UnfixedWidget[-1].input.outline=(255,255,255)			
 			return False
+			
 	def ClickGetType(self):
 		if self.addTask==True:
 			if self.UnfixedWidget[-1].fixrbut.gettasktype(self.myMouse.get_pos())=="fix":
@@ -373,6 +421,9 @@ class mainUI():
 		else:
 			return False
 
+
+
+
 	def clickGetPriority(self):
 		if util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].priority):			
 			self.UnfixedWidget[-1].priority.highlight((71, 62, 63))
@@ -396,6 +447,15 @@ class mainUI():
 				self.UnfixedWidget[-1].partition.value=True
 			elif self.UnfixedWidget[-1].partition.value==True:
 				self.UnfixedWidget[-1].partition.value=False
+
+	def clickDefaultPriority(self):
+		if self.UnfixedWidget[-1].defaultPriority.getpartition(self.myMouse.get_pos()):
+			print "setting priority"
+			self.setAllAddConditionFalse()
+			if self.UnfixedWidget[-1].defaultPriority.value==False:
+				self.UnfixedWidget[-1].defaultPriority.value=True
+			elif self.UnfixedWidget[-1].defaultPriority.value==True:
+				self.UnfixedWidget[-1].defaultPriority.value=False
 
 	def setAllAddConditionFalse(self):
 		self.UnfixedWidget[-1].isgetDuration=False
@@ -532,8 +592,12 @@ class mainUI():
 			NT.tType=1
 			NT.mStart=int(self.UnfixedWidget[-1].lowerboundhh.text[0]+self.UnfixedWidget[-1].lowerboundhh.text[2])*100+int(self.UnfixedWidget[-1].lowerboundmm.text[0]+self.UnfixedWidget[-1].lowerboundmm.text[2])
 			NT.mEnd=int(self.UnfixedWidget[-1].upperboundhh.text[0]+self.UnfixedWidget[-1].upperboundhh.text[2])*100+int(self.UnfixedWidget[-1].upperboundmm.text[0]+self.UnfixedWidget[-1].upperboundmm.text[2])
-			NT.priority=int(self.UnfixedWidget[-1].priority.text[0]+self.UnfixedWidget[-1].priority.text[2])
 			NT.partition= 1 if(self.UnfixedWidget[-1].partition.value) else 0
+			if self.UnfixedWidget[-1].defaultPriority==True:
+				NT.priority=int(self.UnfixedWidget[-1].priority.text[0]+self.UnfixedWidget[-1].priority.text[2])
+			else:
+				NT.priority=100
+
 			print "task:\t",NT.title,"\tduration:\t",NT.duration,"\ttype:\t",NT.tType,"\tlowerbound\t",NT.mStart,"\tupperbound",NT.mEnd,"\tpriority\t",NT.priority,"\tpartition\t",NT.partition
 			return NT
 	
@@ -594,3 +658,16 @@ class mainUI():
 		pygame.draw.rect(self.AppDisplay,BACGROUND_COLOR,((0,0),(800,50)))
 		self.taskPaneHeader.draw(self.AppDisplay)
 		self.taskPaneHeader.addText("Task",(250,15),self.AppDisplay)
+
+
+'''
+Gerry, ang mga error messages ay naka store sa self.TaskOveflow.messages
+Pwede mong gawin something like
+
+while (len(self.TaskOverflow.messages)!=0):
+	msg =self.TaskOverflow.messages.popleft()
+	(display msg in a dialog box with an "OK" button)
+
+gagawin mo ito everytime na either mag addtask, deletetask, clearsched or edittask ang user
+
+'''	

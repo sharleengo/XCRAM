@@ -132,10 +132,12 @@ class DisplayInfo(pygame.Rect):
 
 		#draw info
 		surface.blit(self.font.render("TASK INFORMATION" , True, (71, 62, 63)), (self.position[0]+120,self.position[1]+30))
-		surface.blit(self.font.render("task id:                  " + str(self.TBUI.status.tid), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+60))
-		surface.blit(self.font.render("task name:            " + self.TBUI.status.title, True, (71, 62, 63)), (self.position[0]+40,self.position[1]+90))
+		surface.blit(self.font.render("task title:            " + self.TBUI.status.title, True, (71, 62, 63)), (self.position[0]+40,self.position[1]+90))
 		#surface.blit(self.font.render("task id:                  " + str(self.TBUI.status.tid), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+120))
-		surface.blit(self.font.render("task type:                 " + str(self.TBUI.status.tType), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+150))
+		if(self.TBUI.status.tType):
+			surface.blit(self.font.render("task type:                 " + "flexible", True, (71, 62, 63)), (self.position[0]+40,self.position[1]+150))
+		else:
+			surface.blit(self.font.render("task type:                 " + "fixed", True, (71, 62, 63)), (self.position[0]+40,self.position[1]+150))
 		surface.blit(self.font.render("task duration:          " + str(self.TBUI.status.duration), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+180))
 		if self.TBUI.status.tType==0:
 			surface.blit(self.font.render("task must start at :   " + str(self.TBUI.status.mStart), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+210))	
@@ -144,8 +146,15 @@ class DisplayInfo(pygame.Rect):
 		if self.TBUI.status.tType==1:
 			surface.blit(self.font.render("task must start as early as  :   " + str(self.TBUI.status.mStart), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+210))	
 			surface.blit(self.font.render("task must end as late as :       " + str(self.TBUI.status.mEnd), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+240))	
-			surface.blit(self.font.render("partition:                                  " + str(self.TBUI.status.partition), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+270))	
-			surface.blit(self.font.render("priority:                                    " + str(self.TBUI.status.priority), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+300))	 
+			
+			if (self.TBUI.status.partition):
+				surface.blit(self.font.render("partition:                                  " + "enabled", True, (71, 62, 63)), (self.position[0]+40,self.position[1]+270))	
+			else:
+				surface.blit(self.font.render("partition:                                  " + "disabled", True, (71, 62, 63)), (self.position[0]+40,self.position[1]+270))	
+			if(self.TBUI.status.priority>99):
+				surface.blit(self.font.render("priority:                                    " + "none", True, (71, 62, 63)), (self.position[0]+40,self.position[1]+300))	 
+			else:	
+				surface.blit(self.font.render("priority:                                    " + str(self.TBUI.status.priority), True, (71, 62, 63)), (self.position[0]+40,self.position[1]+300))	 
  
 		self.delete.draw(surface)
 		self.cancel.draw(surface)
@@ -247,6 +256,7 @@ class AddTaskUI(pygame.Rect):
 		self.isgetlowerbound=False
 		self.isgetupperbound=False
 		self.isgetpriority=False
+		self.defaultNoPriority=True
 
 		self.position=position
 		self.dimension=dimension
@@ -271,6 +281,7 @@ class AddTaskUI(pygame.Rect):
 		self.upperboundmm=Button((self.position[0]+400,self.position[1]+190),(255,255,255),(35,30),"0 0")
 		self.priority=Button((self.position[0]+400,self.position[1]+230),(255,255,255),(35,30),"0 0")
 		self.partition=boolButton((self.position[0]+420,self.position[1]+275),(148,0,211),10,False)
+		self.defaultPriority=boolButton((self.position[0]+320,self.position[1]+245),(148,0,211),10,False)
 
 
 	def concatenateInputText(self,char):
@@ -306,7 +317,12 @@ class AddTaskUI(pygame.Rect):
 			self.lowerboundmm.text=str((TBUI_status.mStart%100)/10)+' '+str((TBUI_status.mStart%10))
 			self.upperboundhh.text=str(TBUI_status.mEnd/1000)+' '+str((TBUI_status.mEnd%1000)/100)
 			self.upperboundmm.text=str((TBUI_status.mEnd%100)/10)+' '+str((TBUI_status.mEnd%10))
-			self.priority.text=str((TBUI_status.priority%100)/10)+' '+str((TBUI_status.priority%10))
+			if self.TBUI.status.priority<100:
+				self.priority.text=str((TBUI_status.priority%100)/10)+' '+str((TBUI_status.priority%10))
+				self.defaultPriority.value=True
+			elif self.TBUI.status.priority>=100:
+				self.defaultPriority.value=False
+
 			self.partition.value=bool(TBUI_status.partition)
 
 
@@ -331,6 +347,7 @@ class AddTaskUI(pygame.Rect):
 		self.upperboundmm.draw(surface)
 		self.priority.draw(surface)
 		self.partition.draw(surface)
+		self.defaultPriority.draw(surface)
 
 		#
 		self.font = pygame.font.SysFont('Helvetica', 16)

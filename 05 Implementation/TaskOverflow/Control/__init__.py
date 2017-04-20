@@ -39,6 +39,7 @@ Software Project (Task OverFlow).
 
 '''
 from Data.__init__ import *
+from collections import deque
 import heapq
 
 # Given a schedule, this class hanldles all the possible manipulations (add task, delete task, clear schedule) that 
@@ -48,6 +49,7 @@ class Scheduler:
 	# CS: the current schedule
 	def __init__(self):
 		self.CS = Schedule()
+		self.messages = deque([])
 		self.loadSched()
 	def displaySched(self): 
 		pointer=self.CS.sched
@@ -137,7 +139,9 @@ class Scheduler:
 					error+=1 # There is no use in kicking the flexible tasks(if any) because there is another fixed task
 							 # that is occupying the desired timeslot.			
 			if(error>0):
-				self.message("The new task may no longer be added due to conflicts with another fixed task")
+				m="The new task: \""+ NT.title +"\" may no longer be added due to conflicts with another fixed task."
+				self.message(m)
+				self.messages.append(m)
 				return None
 
 			else:			
@@ -148,7 +152,9 @@ class Scheduler:
 					slotFound=TB # The slot that we found exactly fits the new fixed task so no splitting is needed.
 			
 				slotFound.status=NT
-				self.message("The new fixed task was successfully added!")		
+				m= "The new fixed task: \""+ NT.title +"\" was successfully added!"	
+				self.message(m)
+				self.messages.append(m)
 
 		else:	#Adding a flexible task			
 			TB= self.CS.locateFreeFitTB(NT)
@@ -162,13 +168,17 @@ class Scheduler:
 					slotFound = TB
 				slotFound.status=NT
 				self.displaySched()
-				self.message("The new task was successfully added!")
+				m= "The new flexible task \"" + NT.title +"\" was successfully added!"	
+				self.message(m)
+				self.messages.append(m)
 				return 	
 
 			elif(NT.partition==1 and self.CS.canPartition(NT)):	
 				self.CS.partition(NT)
 				self.displaySched()
-				self.message("The new task was added by partitioning!")	
+				m= "The new flexible task \""+ NT.title +"\" was added by partitioning."	
+				self.message(m)
+				self.messages.append(m)	
 				return 
 
 			tasksToKick = self.CS.canKickFree(NT)	
@@ -179,7 +189,9 @@ class Scheduler:
 				heapq.heappush(self.CS.PQ,NT)
 
 			else:
-				self.message("The task \""+NT.title+"\" can no longer fit into the schedule")
+				m="The task \""+NT.title+"\" can no longer fit into the schedule."
+				self.message(m)
+				self.messages.append(m)
 				return 
 
 		if(len(self.CS.PQ)!=0):
@@ -193,7 +205,10 @@ class Scheduler:
 		tasktodelete=[]
 		tasktodelete.append(tid)
 		self.CS.Kick(tasktodelete)
-		self.CS.PQ=[]
+		deletedTask =heapq.heappop(self.CS.PQ)
+		m= "The task \"" + deletedTask.title +"\" was successfully deleted!"
+		self.message(m)
+		self.messages.append(m)	
 
 	def editTask(self,NT,tid):
 		pointer = self.CS.sched
@@ -219,9 +234,15 @@ class Scheduler:
 					pointer.status = NT
 				pointer = pointer.next	
 
+		m= "The task \"" + editThis.title +"\" was successfully edited!"
+		self.message(m)
+		self.messages.append(m)	
 
 	def clearSched(self):
 		self.CS.clear()	
+		m= "The schedule was successfully cleared!"
+		self.message(m)
+		self.messages.append(m)
 
 	def saveSched(self):
 		fob=open("Data/mySched.txt","w")
