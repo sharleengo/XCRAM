@@ -116,7 +116,8 @@ class Scheduler:
 		print " "+msg+" "
 		print '*'*(len(msg)+4)+"\n"
 
-	def addTask(self,NT):
+	# If res is set to 1 it means that the error message associated with this method was caused by rescheduling.
+	def addTask(self,NT,res):
 		TB=None
 		error=0		#this will be set to 1 if the new task can no longer be added to the current schedule
 		if(NT.tType==0):	#adding a fixed task
@@ -139,7 +140,7 @@ class Scheduler:
 					error+=1 # There is no use in kicking the flexible tasks(if any) because there is another fixed task
 							 # that is occupying the desired timeslot.			
 			if(error>0):
-				m="The new task: \""+ NT.title +"\" may no longer be added due to conflicts with another fixed task."
+				m="The task: \""+ NT.title +"\" may no longer be added due to conflicts with another fixed task."
 				self.message(m)
 				self.messages.append(m)
 				return None
@@ -152,9 +153,10 @@ class Scheduler:
 					slotFound=TB # The slot that we found exactly fits the new fixed task so no splitting is needed.
 			
 				slotFound.status=NT
-				m= "The new fixed task: \""+ NT.title +"\" was successfully added!"	
-				self.message(m)
-				self.messages.append(m)
+				if(not res):
+					m= "The fixed task: \""+ NT.title +"\" was successfully added!"	
+					self.message(m)
+					self.messages.append(m)
 
 		else:	#Adding a flexible task			
 			TB= self.CS.locateFreeFitTB(NT)
@@ -168,15 +170,19 @@ class Scheduler:
 					slotFound = TB
 				slotFound.status=NT
 				self.displaySched()
-				m= "The new flexible task \"" + NT.title +"\" was successfully added!"	
-				self.message(m)
-				self.messages.append(m)
+				if(not res):
+					m= "The flexible task \"" + NT.title +"\" was successfully added!"	
+					self.message(m)
+					self.messages.append(m)
 				return 	
 
 			elif(NT.partition==1 and self.CS.canPartition(NT)):	
 				self.CS.partition(NT)
 				self.displaySched()
-				m= "The new flexible task \""+ NT.title +"\" was added by partitioning."	
+				if(not res):
+					m= "The flexible task \""+ NT.title +"\" was added by partitioning."		
+				else:
+					m= "Rescheduling caused the flexible task \""+ NT.title +"\" to be partitioned."	
 				self.message(m)
 				self.messages.append(m)	
 				return 
@@ -197,18 +203,20 @@ class Scheduler:
 		if(len(self.CS.PQ)!=0):
 			self.reschedule()
 		self.displaySched()
+	
 	def reschedule(self):
 		while (len(self.CS.PQ)!=0):
-			self.addTask(heapq.heappop(self.CS.PQ))	
+			self.addTask(heapq.heappop(self.CS.PQ),1)	
 
-	def deleteTask(self,tid):						
+	def deleteTask(self,tid,res):						
 		tasktodelete=[]
 		tasktodelete.append(tid)
 		self.CS.Kick(tasktodelete)
 		deletedTask =heapq.heappop(self.CS.PQ)
-		m= "The task \"" + deletedTask.title +"\" was successfully deleted!"
-		self.message(m)
-		self.messages.append(m)	
+		if(not res):
+			m= "The task \"" + deletedTask.title +"\" was successfully deleted!"
+			self.message(m)
+			self.messages.append(m)	
 
 	def editTask(self,NT,tid):
 		pointer = self.CS.sched
@@ -225,8 +233,8 @@ class Scheduler:
 			mustReschedule = True
 
 		if(mustReschedule):
-			self.deleteTask(tid)
-			self.addTask(NT)
+			self.deleteTask(tid,1)
+			self.addTask(NT,1)
 		else:
 			pointer.status = NT
 			while(pointer!=None):
@@ -234,7 +242,17 @@ class Scheduler:
 					pointer.status = NT
 				pointer = pointer.next	
 
-		m= "The task \"" + editThis.title +"\" was successfully edited!"
+		pointer = self.CS.sched
+		while (pointer!=None):
+			if(pointer.status!=None and pointer.status.tid == tid):
+				break
+			pointer = pointer.next
+
+		# print a success message if and only if editing did not cause the chosen task to be deleted.	
+		if(pointer!=None):
+			m= "The task \"" + editThis.title +"\" was successfully edited!"
+		else:
+			m= "Editing caused the task \"" + editThis.title +"\" to be removed because its new conditions does not allow it to fit the schedule."	
 		self.message(m)
 		self.messages.append(m)	
 

@@ -185,7 +185,7 @@ class mainUI():
 						if self.deleteTask==True:
 							if util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].delete):
 								print "delete task"
-								self.TaskAllocator.deleteTask(self.UnfixedWidget[-1].TBUI.status.tid)
+								self.TaskAllocator.deleteTask(self.UnfixedWidget[-1].TBUI.status.tid,0)
 								self.UnfixedWidget=[]
 								self.deleteTask=False
 							elif util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].cancel):
@@ -496,7 +496,7 @@ class mainUI():
 				NT = Task()
 				NT=self.extractData(NT)
 				if( not NT.invalidArguments() ) and self.UnfixedWidget[-1].input.text!="    task: ":
-					self.TaskAllocator.addTask(NT)
+					self.TaskAllocator.addTask(NT,0)
 					self.UnfixedWidget=[]
 					self.addTask=False
 					getTask=False			
@@ -565,11 +565,6 @@ class mainUI():
 					print "Task not edited. Invalid Argument(s)"
 
 
-				'''
-					Sharleen dito mo ilalagay yung function mo sa edit
-					if id yung reference mo sa edit, para maaccess mo yun->self.UnfixedWidget[-1].TBUI.status.tid
-					gamitin mo yung extractData na function dito, if necessary
-				'''
 
 	def confirmedClear(self):
 		if self.clearTask==True:
