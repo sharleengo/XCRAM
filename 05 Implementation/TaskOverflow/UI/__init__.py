@@ -68,6 +68,7 @@ class mainUI():
 	def __init__(self):
 
 		pygame.init()
+		pygame.display.set_caption('Task Overflow')
 		self.AppDisplay=pygame.display.set_mode((WIN_SIZE_X,WIN_SIZE_Y)) 	
 		self.myMouse=pygame.mouse 
 		self.myMouse.set_cursor(*pygame.cursors. arrow)	
@@ -132,9 +133,16 @@ class mainUI():
 					pass
 
 				elif event.type==pygame.MOUSEBUTTONDOWN:
+
 					if self.myMouse.get_pressed()==(1,0,0):
 						self.ClickAddButton()	#check if addBUtton is clicked, display addTaskUI if such event happens
 						self.ClickClearButton()	#check if ClearButton is Cliked, display a query message if user wants to delete all tasks
+
+						if len(self.UnfixedWidget)!=0: 
+							if isinstance(self.UnfixedWidget[-1],Wid.AlertMessagesUI):
+								if util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].ok):
+									self.UnfixedWidget.pop()
+
 						if self.addTask==True or self.editTask==True:
 							self.getTask=self.ClickGetTask()	#respomsibe for getting the title
 							self.ClickGetType() 				#reponsible for getting the type
@@ -172,7 +180,7 @@ class mainUI():
 							self.confirmedClear()
 							self.cancelClear()
 
-						if self.addTask==False or self.clearTask==False and self.deleteTask==False:
+						if self.addTask==False and self.clearTask==False and self.deleteTask==False:
 							for i in self.AllocationSpaceUI:
 								if util.isMouseover(self.myMouse.get_pos(),i):
 									if i.status!=None:
@@ -188,11 +196,24 @@ class mainUI():
 								self.TaskAllocator.deleteTask(self.UnfixedWidget[-1].TBUI.status.tid,0)
 								self.UnfixedWidget=[]
 								self.deleteTask=False
+
+								msg=""
+								while (len(self.TaskAllocator.messages)!=0):
+									msg+=(self.TaskAllocator.messages.popleft()+"\n")
+
+								#myAddTaskUI=Wid.AddTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(182,161,158))
+
+								msgUI=Wid.AlertMessagesUI(msg,(WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(182,161,158),(450,350))
+								self.UnfixedWidget=[]
+								self.clearTask=False
+								self.addTask=False
+								self.editTask=False
+								self.UnfixedWidget.append(msgUI)				
+
 							elif util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].cancel):
 								print "cancel task"
 								self.UnfixedWidget=[]
 								self.deleteTask=False
-
 							elif util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].edit):
 								print "edit task"
 								self.editTask=True
@@ -203,8 +224,22 @@ class mainUI():
 								self.addTask=False
 								self.clearTask=False
 
+								'''msg=""
+								while (len(self.TaskAllocator.messages)!=0):
+									msg+=(self.TaskAllocator.messages.popleft())
+
+								#myAddTaskUI=Wid.AddTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(182,161,158))
+
+								msgUI=Wid.AlertMessagesUI(msg,(WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(182,161,158),(450,350))
+								self.UnfixedWidget=[]
+								self.clearTask=False
+								self.addTask=False
+								self.editTask=False
+								self.UnfixedWidget.append(msgUI)'''			
 
 								#self.addButton=Wid.Button2("UI/res/icons/addButton.png",(625,50),(50,50))
+
+
 
 
 					elif event.button == 4:  #scrolls up the timetable
@@ -275,6 +310,7 @@ class mainUI():
 		quit()
 
 	def ClickAddButton(self):
+		#print self.addTask,self.clearTask,self.deleteTask
 		if self.addTask==False and self.clearTask==False and self.deleteTask==False:
 			if util.isMouseover(self.myMouse.get_pos(),self.addButton):	
 				self.addButton=Wid.Button2("UI/res/icons/addButtonClicked.png",(625,50),(50,50))
@@ -501,6 +537,20 @@ class mainUI():
 					self.addTask=False
 					getTask=False			
 					self.addButton=Wid.Button2("UI/res/icons/addButton.png",(625,50),(50,50))
+
+					msg=""
+					while (len(self.TaskAllocator.messages)!=0):
+						msg+=(self.TaskAllocator.messages.popleft()+"\n")
+
+					#myAddTaskUI=Wid.AddTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(182,161,158))
+
+					msgUI=Wid.AlertMessagesUI(msg,(WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(182,161,158),(450,350))
+					self.UnfixedWidget=[]
+					self.clearTask=False
+					self.addTask=False
+					self.editTask=False
+					self.UnfixedWidget.append(msgUI)
+
 				else:
 					error=NT.invalidArguments()
 					self.UnfixedWidget[-1].durationbuttonhh.outlineColor=(0,0,0)
@@ -566,6 +616,24 @@ class mainUI():
 
 
 
+				msg=""
+				while (len(self.TaskAllocator.messages)!=0):
+					msg+=(self.TaskAllocator.messages.popleft()+"\n")
+
+				#myAddTaskUI=Wid.AddTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(182,161,158))
+
+				msgUI=Wid.AlertMessagesUI(msg,(WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(182,161,158),(450,350))
+				self.UnfixedWidget=[]
+				self.clearTask=False
+				self.addTask=False
+				self.editTask=False
+				self.UnfixedWidget.append(msgUI)
+				'''
+					Sharleen dito mo ilalagay yung function mo sa edit
+					if id yung reference mo sa edit, para maaccess mo yun->self.UnfixedWidget[-1].TBUI.status.tid
+					gamitin mo yung extractData na function dito, if necessary
+				'''
+
 	def confirmedClear(self):
 		if self.clearTask==True:
 			if util.isMouseover(self.myMouse.get_pos(),self.UnfixedWidget[-1].clear):
@@ -575,7 +643,19 @@ class mainUI():
 				self.UnfixedWidget=[]
 				self.clearTask=False
 				self.clearButton=Wid.Button2("UI/res/icons/clearButton.png",(625,110),(50,50))
-				
+
+				msg=""
+				while (len(self.TaskAllocator.messages)!=0):
+					msg+=(self.TaskAllocator.messages.popleft()+"\n")
+
+				#myAddTaskUI=Wid.AddTaskUI((WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(450,350),(182,161,158))
+
+				msgUI=Wid.AlertMessagesUI(msg,(WIN_SIZE_X/2-225,WIN_SIZE_Y/2-175),(182,161,158),(450,350))
+				self.UnfixedWidget=[]
+				self.clearTask=False
+				self.addTask=False
+				self.editTask=False
+				self.UnfixedWidget.append(msgUI)				
 
 	def extractData(self,NT):
 		taskname=self.UnfixedWidget[-1].input.text
@@ -588,7 +668,7 @@ class mainUI():
 			NT.mStart=int(self.UnfixedWidget[-1].lowerboundhh.text[0]+self.UnfixedWidget[-1].lowerboundhh.text[2])*100+int(self.UnfixedWidget[-1].lowerboundmm.text[0]+self.UnfixedWidget[-1].lowerboundmm.text[2])
 			NT.mEnd=int(self.UnfixedWidget[-1].upperboundhh.text[0]+self.UnfixedWidget[-1].upperboundhh.text[2])*100+int(self.UnfixedWidget[-1].upperboundmm.text[0]+self.UnfixedWidget[-1].upperboundmm.text[2])
 			NT.partition= 1 if(self.UnfixedWidget[-1].partition.value) else 0
-			if self.UnfixedWidget[-1].defaultPriority==True:
+			if self.UnfixedWidget[-1].defaultPriority.value==True:
 				NT.priority=int(self.UnfixedWidget[-1].priority.text[0]+self.UnfixedWidget[-1].priority.text[2])
 			else:
 				NT.priority=100

@@ -1,4 +1,5 @@
 import pygame 
+import textwrap
 
 from Data.__init__ import *
 #import inputbox
@@ -61,7 +62,7 @@ class TimeBlockUI(Button,TimeBlock):
 		self.font = pygame.font.SysFont('Helvetica', 18)
 		#self.font.set_bold(self.bold)
 		
-		surface.blit(self.font.render(str(self.stime)+"-"+str(self.etime), True, (71, 62, 63)), (self.position[0]-95,self.position[1]+10))	
+		surface.blit(self.font.render(str("%02d"%(self.stime/100))+":"+str("%02d"%(self.stime%100))+"-"+str("%02d"%(self.etime/100))+":"+str("%02d"%(self.etime%100)), True, (71, 62, 63)), (self.position[0]-95,self.position[1]+10))	
 		if self.status!=None:
 			surface.blit(self.font.render(self.status.title, True, (71, 62, 63)), (self.position[0]+30,self.position[1]+10))
 
@@ -375,3 +376,22 @@ class editTaskUI(AddTaskUI):
 		self.extractData(self.TBUI.status)
 		self.add.text="    edit"
 
+class AlertMessagesUI(pygame.Rect):
+	def __init__(self,messages,position,color,dimension):
+		self.messages=messages
+		self.position=position
+		self.color=color
+		self.dimension=dimension
+		self.rect=pygame.Rect(self.position,self.dimension)
+		self.ok=Button((self.position[0]+75,self.position[1]+300),(255,255,255),(75,25),"   ok",(20,20,20))
+
+	def draw(self,surface):
+		#pygame.draw.rect(surface,self.shadow_color,self.shadow)
+		pygame.draw.rect(surface,self.color,self.rect)
+		self.ok.draw(surface)
+		self.font = pygame.font.SysFont('Helvetica', 16)
+
+		j=0
+		for i in self.messages.split("\n"):
+			surface.blit(self.font.render(i, True, (0,0,0)), (self.position[0]+20,self.position[1]+65+(j*20)))
+			j+=1

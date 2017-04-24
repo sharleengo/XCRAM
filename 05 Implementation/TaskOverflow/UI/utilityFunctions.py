@@ -125,4 +125,6 @@ def getpriority(Object,counter,event,condition):
 				elif counter==1:
 					buttonp.edit('0',2)
 				counter-=1	
+
+	print buttonp.text
 	return UnfixedWidget,counter
